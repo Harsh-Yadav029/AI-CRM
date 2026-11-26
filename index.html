@@ -5,6 +5,9 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <meta name="description" content="Future Tech Minds 3 – Interactive Computational Thinking for Kids">
   <meta name="theme-color" content="#3a57e8">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <link rel="manifest" href="/manifest.json">
   <title>Future Tech Minds 3 – Interactive Computational Thinking</title>
 
   <!-- Fredoka font embedded locally (zero internet required) -->
@@ -231,6 +234,120 @@
       pointer-events: auto;
       /* Pull up slightly from bottom */
       padding-bottom: 8px;
+    }
+
+    @media (max-width: 640px) {
+      .cover-actions { padding-bottom: 58px; }
+    }
+
+    /* ========== POWERED BY FITSCALEZ BADGE ========== */
+    .fitscalez-wrap {
+      position: fixed;
+      bottom: calc(20px + env(safe-area-inset-bottom, 0px));
+      right: clamp(14px, 3vw, 32px);
+      z-index: 4;
+      pointer-events: auto;
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      gap: 8px;
+    }
+
+    @media (max-width: 640px) {
+      .fitscalez-wrap {
+        right: 50%;
+        transform: translateX(50%);
+        bottom: calc(14px + env(safe-area-inset-bottom, 0px));
+        align-items: center;
+      }
+    }
+
+    .fitscalez-badge {
+      position: relative;
+      overflow: hidden;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 16px;
+      border-radius: var(--radius-pill);
+      background: var(--card);
+      border: 2px solid var(--line);
+      box-shadow: 0 8px 24px rgba(20, 30, 90, 0.16);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      font: inherit;
+      font-size: clamp(0.8rem, 2.2vw, 0.95rem);
+      color: var(--mut);
+      cursor: pointer;
+      touch-action: manipulation;
+      transition: transform 0.22s cubic-bezier(0.3, 1.4, 0.5, 1), box-shadow 0.22s ease, border-color 0.22s ease;
+    }
+
+    .fitscalez-badge::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(110deg, transparent 25%, rgba(255,255,255,0.55) 50%, transparent 75%);
+      transform: translateX(-120%);
+      animation: fz-shimmer 4s ease-in-out infinite;
+      pointer-events: none;
+    }
+
+    @keyframes fz-shimmer {
+      0%, 60% { transform: translateX(-120%); }
+      100%    { transform: translateX(120%); }
+    }
+
+    .fitscalez-badge:hover {
+      transform: translateY(-3px) scale(1.05);
+      border-color: var(--acc);
+      box-shadow: 0 12px 28px rgba(58, 87, 232, 0.24);
+    }
+
+    .fitscalez-badge:active {
+      transform: scale(0.96);
+    }
+
+    .fitscalez-icon {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--acc), var(--acc2));
+      color: #fff;
+      font-size: 0.85rem;
+      box-shadow: 0 2px 8px rgba(232, 52, 106, 0.35);
+      transition: transform 0.35s ease;
+    }
+
+    .fitscalez-badge:hover .fitscalez-icon {
+      transform: rotate(20deg) scale(1.1);
+    }
+
+    .fitscalez-brand {
+      font-weight: 700;
+      letter-spacing: 0.01em;
+      background: linear-gradient(90deg, var(--acc), var(--acc2));
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+    }
+
+    .fitscalez-pop {
+      background: var(--card);
+      border: 2px solid var(--acc);
+      border-radius: 16px;
+      padding: 10px 14px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: var(--ink);
+      box-shadow: 0 10px 28px rgba(20, 30, 90, 0.2);
+      backdrop-filter: blur(12px);
+      max-width: 240px;
+      text-align: center;
+      animation: fi 0.25s ease both;
     }
 
     .scroll-hint {
@@ -770,6 +887,13 @@
         <div class="scroll-hint" id="scroll-hint-btn">↓ Scroll to explore</div>
         <button class="btn big" id="open-book-btn">Open the book 📖</button>
       </div>
+      <div class="fitscalez-wrap">
+        <div class="fitscalez-pop" id="fitscalez-pop" hidden>✨ Interactive AI Learning by <b>Fitscalez</b></div>
+        <button class="fitscalez-badge" id="fitscalez-btn" type="button" aria-label="Powered by Fitscalez">
+          <span class="fitscalez-icon" aria-hidden="true">⚡</span>
+          <span>Powered by <span class="fitscalez-brand">Fitscalez</span></span>
+        </button>
+      </div>
     </div>
   </section>
 
@@ -992,7 +1116,8 @@
             if (pct < 100) {
               loadIndicator.textContent = 'Loading animation… ' + pct + '%';
             } else {
-              loadIndicator.classList.add('done');
+              loadIndicator.textContent = 'Offline ready ✓';
+              setTimeout(() => loadIndicator.classList.add('done'), 2000);
             }
             const curIdx = Math.round(currentProgress * (TOTAL_FRAMES - 1));
             if (Math.abs(curIdx - idx) <= 3) scheduleRender();
@@ -1040,6 +1165,21 @@
     openBookBtn.onclick  = openBook;
     rewatchBtn.onclick   = closeBook;
     scrollHintBtn.onclick = () => window.scrollBy({ top: window.innerHeight * 0.85, behavior: 'smooth' });
+
+    const fitscalezBtn = document.getElementById('fitscalez-btn');
+    const fitscalezPop = document.getElementById('fitscalez-pop');
+    let fzTimer = null;
+    if (fitscalezBtn && fitscalezPop) {
+      fitscalezBtn.onclick = () => {
+        [523, 659, 784].forEach((f, i) => tone(f, 0.12, i * 0.06));
+        pop();
+        fitscalezPop.hidden = !fitscalezPop.hidden;
+        clearTimeout(fzTimer);
+        if (!fitscalezPop.hidden) {
+          fzTimer = setTimeout(() => { fitscalezPop.hidden = true; }, 3500);
+        }
+      };
+    }
 
     /* ============================================================
        12. EVENT LISTENERS
