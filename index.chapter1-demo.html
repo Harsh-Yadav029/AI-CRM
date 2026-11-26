@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Future Tech Minds 3 – Chapter 1 Demo</title>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg1:#d9f1ff;--bg2:#ffe6f1;--card:#fffffff0;--ink:#1d2a5b;--mut:#56628f;--acc:#3a57e8;--acc2:#e8346a;--good:#0e8f5c;--bad:#d23b31;--line:#cdd7fa;--tile:#eef2ff;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg1:#0f1736;--bg2:#2a1240;--card:#18204af0;--ink:#eef1ff;--mut:#aab4e8;--acc:#5a70ff;--acc2:#e8457a;--good:#3ddc97;--bad:#ff7d72;--line:#334088;--tile:#222c63}}
+:root[data-theme="dark"]{--bg1:#0f1736;--bg2:#2a1240;--card:#18204af0;--ink:#eef1ff;--mut:#aab4e8;--acc:#5a70ff;--acc2:#e8457a;--good:#3ddc97;--bad:#ff7d72;--line:#334088;--tile:#222c63}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*{box-sizing:border-box}
+body{margin:0;font-family:'Fredoka','Trebuchet MS',system-ui,sans-serif;color:var(--ink);background:linear-gradient(160deg,var(--bg1),var(--bg2)) fixed;min-height:100%}
+[hidden]{display:none!important}
+#c{position:fixed;inset:0;width:100%;height:100%;z-index:0}
+.cover{position:fixed;inset:0;z-index:2;display:flex;flex-direction:column;justify-content:space-between;align-items:center;text-align:center;padding:calc(5vh + env(safe-area-inset-top,0px)) 20px calc(5vh + env(safe-area-inset-bottom,0px));transition:opacity .5s}
+.cover.go{opacity:0;pointer-events:none}
+.brand{margin:0;font-weight:600;color:var(--mut)}
+h1{margin:.1em 0;font-size:clamp(2.4rem,9vw,4.6rem);line-height:1;color:var(--acc);text-shadow:0 4px 0 var(--card)}
+h1 b{color:var(--acc2)}
+.sub{font-size:clamp(1.1rem,3.5vw,1.6rem);font-weight:600;margin:.4em 0}
+.btn{font:inherit;font-weight:700;border:0;border-radius:99px;padding:.65em 1.2em;background:var(--acc);color:#fff;cursor:pointer;box-shadow:0 4px 0 rgba(0,0,0,.22)}
+.btn:active{transform:translateY(2px)}
+.btn:focus-visible,.opt:focus-visible,.tb:focus-visible,td:focus-visible,input:focus-visible{outline:3px solid var(--acc2);outline-offset:2px}
+.btn.alt{background:var(--tile);color:var(--ink);border:2px solid var(--line)}
+.btn.big{font-size:1.4rem;padding:.7em 1.8em;background:var(--acc2);animation:bob 1.6s infinite}
+@keyframes bob{50%{transform:translateY(-6px)}}
+#book{position:relative;z-index:1;max-width:780px;margin:0 auto;padding:14px 14px 40px;animation:fi .8s}
+@keyframes fi{from{opacity:0}}
+.top{display:flex;align-items:center;gap:10px;justify-content:space-between}
+.top h2{margin:0;font-size:1.05rem}.top h2 span{color:var(--acc2)}
+.pill{background:var(--card);border:2px solid var(--line);border-radius:99px;padding:.25em .8em;font-weight:700;white-space:nowrap}
+#tabs{display:flex;gap:8px;overflow-x:auto;padding:12px 2px}
+.tb{font:inherit;font-weight:700;min-width:44px;height:44px;border-radius:50%;border:2px solid var(--line);background:var(--card);color:var(--ink);cursor:pointer}
+.tb.dn{background:var(--good);color:#fff;border-color:var(--good)}
+.tb.on{background:var(--acc);color:#fff;border-color:var(--acc);transform:scale(1.1)}
+.page{background:var(--card);border-radius:26px;padding:20px;box-shadow:0 14px 40px rgba(20,30,90,.25);transform-origin:left center;animation:flip .7s ease}
+@keyframes flip{from{transform:perspective(1100px) rotateY(-75deg);opacity:0}}
+.meta{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.chip{background:var(--tile);border-radius:99px;padding:.2em .8em;font-weight:700;font-size:.9rem}
+.chip.s{color:var(--acc2);margin-right:auto}
+h3{font-size:1.25rem;margin:.7em 0;line-height:1.3;max-width:60ch}
+.ghost{font:inherit;background:none;border:2px solid var(--line);color:var(--ink);border-radius:99px;padding:.2em .8em;cursor:pointer}
+.scale{display:flex;align-items:center;gap:10px;flex-wrap:wrap;background:var(--tile);border-radius:18px;padding:10px 14px;margin:8px 0;font-size:1.6rem}
+.scale .bal{font-size:2.2rem}.scale b{background:var(--card);border-radius:12px;padding:0 .5em}
+.scale label{margin-left:auto;font-weight:700}
+input.num{width:84px;font:inherit;font-size:1.4rem;text-align:center;border:3px solid var(--line);border-radius:14px;padding:.2em;background:var(--card);color:var(--ink)}
+input.num.ok{border-color:var(--good)}input.num.bad{border-color:var(--bad)}
+.hg{display:grid;grid-template-columns:repeat(3,64px);width:max-content;margin:8px 0;border:3px solid var(--mut);font-size:2rem;text-align:center}
+.hg i{font-style:normal;border:1px solid var(--mut);padding:6px 0}
+.ops{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:12px}
+.opt{font:inherit;color:var(--ink);background:var(--tile);border:3px solid var(--line);border-radius:20px;padding:12px 6px;cursor:pointer;position:relative;display:flex;flex-direction:column;align-items:center;gap:4px;transition:transform .2s}
+.opt:hover{transform:translateY(-4px) rotate(-1deg)}
+.opt .em{font-size:3rem;line-height:1.1}.opt .lt{font-weight:700;background:var(--card);border-radius:50%;width:30px;height:30px;line-height:30px}
+.opt.sel{border-color:var(--acc)}.opt.ok{border-color:var(--good);background:var(--card)}.opt.bad{border-color:var(--bad)}
+.opt.hl{border-color:var(--good);transform:scale(1.06)}.opt.dim{opacity:.45}
+.ops.st{pointer-events:none}
+ol.cl{padding-left:1.3em;line-height:1.6;max-width:60ch}
+.lg{border-collapse:separate;border-spacing:4px;margin:8px 0}
+.lg th{background:var(--tile);border-radius:10px;padding:6px 10px;text-align:left}
+.lg tr.ok th{background:var(--good);color:#fff}.lg tr.bad th{background:var(--bad);color:#fff}
+.lg td{width:46px;height:42px;background:var(--tile);border-radius:10px;cursor:pointer;text-align:center;font-size:1.4rem;color:var(--good);border:2px solid var(--line)}
+.lg td.on{background:var(--card);border-color:var(--acc)}
+.acts{display:flex;gap:10px;flex-wrap:wrap;margin:14px 0;align-items:center}
+.bot{display:flex;gap:10px;align-items:center}
+.bot>span{font-size:2.4rem;animation:bob 2.4s infinite}
+.bot p{margin:0;background:var(--tile);border-radius:6px 20px 20px 20px;padding:.6em 1em;font-weight:600}
+.sol{margin-top:14px;border:3px dashed var(--acc);border-radius:20px;padding:14px}
+.sol h4{margin:0 0 8px}.viz{background:var(--tile);border-radius:16px;padding:12px;text-align:center;font-size:1.5rem;margin-bottom:8px}
+.sol li{margin:.3em 0;opacity:.7}.sol li.now{opacity:1;font-weight:700}
+.eq{font-size:1.6rem;font-weight:700;margin:6px 0}.sqv{width:170px;height:170px}
+.ln{display:grid;grid-template-columns:repeat(5,1fr);gap:6px}
+.sl{background:var(--card);border:2px dashed var(--line);border-radius:12px;padding:6px 2px;font-size:1.4rem;min-height:84px}
+.sl.f{border:2px solid var(--good)}.sl small,.sl b{display:block;font-size:.8rem}
+.nav{display:flex;justify-content:space-between;margin-top:14px}
+.bar{height:16px;background:var(--tile);border-radius:99px;overflow:hidden;margin:4px 0 12px}.bar i{display:block;height:100%;background:var(--good);border-radius:99px}
+.cf{position:fixed;top:-30px;font-size:26px;z-index:9;pointer-events:none;animation:fall 1.8s ease-in forwards}
+@keyframes fall{to{transform:translate(var(--dx),105vh) rotate(540deg)}}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style></head>
+<body>
+<canvas id="c" aria-hidden="true"></canvas>
+<main class="cover" id="cover">
+ <div><p class="brand">Brainwave’s</p><h1>Future Tech <b>Minds 3</b></h1><p class="sub">Test Your Computational Thinking Skills</p></div>
+ <button class="btn big" id="go">Open the book</button>
+</main>
+<section id="book" hidden>
+ <div class="top"><h2>Chapter 1: <span>Future Ready Thinking</span></h2><span class="pill" id="stars">⭐ 0</span><button class="ghost" id="snd" aria-label="Toggle sound">🔊</button></div>
+ <nav id="tabs" aria-label="Questions"></nav>
+ <article class="page" id="pg" aria-live="polite"></article>
+ <div class="nav"><button class="btn alt" id="pv">‹ Back</button><button class="btn" id="nx">Next ›</button></div>
+</section>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script>
+const $=s=>document.querySelector(s),RM=matchMedia('(prefers-reduced-motion:reduce)').matches;
+let AC,snd=1,mode='cover',open=0,t0=0,GL=1,mx=0;
+function tone(f,d=.15,w=0){if(!snd)return;try{AC=AC||new AudioContext();const o=AC.createOscillator(),g=AC.createGain(),n=AC.currentTime+w;o.frequency.value=f;o.type='triangle';g.gain.setValueAtTime(.15,n);g.gain.exponentialRampToValueAtTime(.001,n+d);o.connect(g);g.connect(AC.destination);o.start(n);o.stop(n+d)}catch(e){}}
+const win=()=>[523,659,784].forEach((f,i)=>tone(f,.2,i*.1)),oops=()=>tone(200,.3);
+function pop(){if(RM)return;for(let i=0;i<28;i++){const s=document.createElement('span');s.className='cf';s.textContent=['⭐','🎉','✨','🎈'][i%4];s.style.cssText=`left:${Math.random()*100}vw;--dx:${(Math.random()-.5)*220}px;animation-delay:${Math.random()*.3}s`;document.body.append(s);setTimeout(()=>s.remove(),2300)}}
+
+/* ---------- 3D scene ---------- */
+try{
+const R=new THREE.WebGLRenderer({canvas:$('#c'),alpha:true,antialias:true});R.setPixelRatio(Math.min(devicePixelRatio,2));
+const S=new THREE.Scene(),C=new THREE.PerspectiveCamera(45,1,.1,100);
+S.add(new THREE.HemisphereLight(0xffffff,0x8899ff,1.1));const dl=new THREE.DirectionalLight(0xffffff,.9);dl.position.set(3,5,4);S.add(dl);
+const M=c=>new THREE.MeshStandardMaterial({color:c,roughness:.4}),cols=[0xff5c8a,0x3a57e8,0xffc233,0x2fc27a,0xff8a3d,0x9b6bff];
+const geos=[new THREE.IcosahedronGeometry(.5),new THREE.BoxGeometry(.7,.7,.7),new THREE.TorusGeometry(.4,.15,12,24),new THREE.OctahedronGeometry(.55)],fl=[];
+for(let i=0;i<26;i++){const m=new THREE.Mesh(geos[i%4],M(cols[i%6]));m.position.set((Math.random()-.5)*16,(Math.random()-.5)*10,-2-Math.random()*8);m.userData={s:Math.random()*.01+.003,p:Math.random()*6};fl.push(m);S.add(m)}
+const bk=new THREE.Group(),B=new THREE.Group(),fp=new THREE.Group();
+const back=new THREE.Mesh(new THREE.BoxGeometry(2,2.7,.12),M(0x2c43c9));back.position.set(1,0,-.2);
+const pages=new THREE.Mesh(new THREE.BoxGeometry(1.9,2.6,.3),M(0xfff6e0));pages.position.set(1,0,0);
+const front=new THREE.Mesh(new THREE.BoxGeometry(2,2.7,.12),M(0xe8346a));front.position.set(1,0,.2);
+const em=new THREE.Mesh(new THREE.IcosahedronGeometry(.42),M(0xffc233));em.position.set(1,.2,.36);
+const em2=new THREE.Mesh(new THREE.TorusGeometry(.7,.05,8,32),M(0xffffff));em2.position.set(1,.2,.3);
+fp.add(front,em,em2);B.add(back,pages,fp);B.position.x=-1;bk.add(B);S.add(bk);
+const zc=()=>C.aspect<.8?12:7.5,ease=t=>t<.5?2*t*t:1-Math.pow(-2*t+2,2)/2;
+function rs(){R.setSize(innerWidth,innerHeight,false);C.aspect=innerWidth/innerHeight;C.updateProjectionMatrix()}
+rs();addEventListener('resize',rs);C.position.z=zc();
+addEventListener('pointermove',e=>mx=e.clientX/innerWidth-.5);
+(function loop(now){requestAnimationFrame(loop);const t=now/1000;
+ fl.forEach(m=>{m.rotation.x+=m.userData.s;m.rotation.y+=m.userData.s*1.3;m.position.y+=Math.sin(t+m.userData.p)*.002});
+ if(mode=='cover'){
+  if(open){const e=Math.min((now-t0)/1900,1),k=ease(e);fp.rotation.y=-2.7*k;bk.rotation.y=-.5*(1-k);C.position.z=zc()-(C.aspect<.8?5:3.2)*k;em.visible=em2.visible=e<.5;
+   bk.scale.setScalar(e>.85?Math.max(0,1-(e-.85)/.15):1);if(e>=1)fin()}
+  else{bk.rotation.y=-.5+Math.sin(t*.7)*.2;bk.position.y=Math.sin(t)*.1;em.rotation.y=t;em2.rotation.z=t}
+ }else{C.position.z+=(zc()+2-C.position.z)*.04}
+ C.position.x+=(mx*1.2-C.position.x)*.04;C.lookAt(0,0,0);R.render(S,C)})(0);
+}catch(e){GL=0}
+function fin(){mode='read';$('#cover').classList.add('go');$('#book').hidden=false;show(0)}
+$('#go').onclick=()=>{if(open)return;tone(660,.12);open=1;$('#cover').classList.add('go');if(!GL||RM)return fin();t0=performance.now()};
+
+/* ---------- Question bank ---------- */
+const N=['Alisha','Anika','Zoya','Chirag','Ellie'];
+const tiles=(em,nm,hl,show)=>`<div class="ops${hl==null?'':' st'}">`+em.map((e,i)=>`<button class="opt${hl==null?'':i==hl?' hl':' dim'}" data-i="${i}"><span class="em">${e}</span><span class="lt">${'ABCD'[i]}</span>${show?`<small>${nm[i]}</small>`:''}</button>`).join('')+'</div>';
+const mc=(n,t,em,nm,a,why)=>({n,skill:'Classification',t,type:'mcq',key:[a],render:()=>tiles(em,nm),
+ hints:['Say the name of each picture out loud.','Three pictures belong to the same group. What do they do?'],
+ steps:[{t:'Name each picture.',v:tiles(em,nm,-1,1).replace(/hl|dim/g,'')},{t:why,v:tiles(em,nm,a,1)}]});
+const sq=k=>{let s='<svg viewBox="-4 -4 158 158" class="sqv" role="img" aria-label="3 by 3 grid">';for(let i=0;i<9;i++)s+=`<rect x="${i%3*50}" y="${~~(i/3)*50}" width="50" height="50" fill="${k==1?'#3a57e8':'#8899dd'}" fill-opacity="${k==1?.55:.25}" stroke="#56628f"/>`;
+ if(k==2)[[0,0],[50,0],[0,50],[50,50]].forEach((p,i)=>s+=`<rect x="${p[0]+3}" y="${p[1]+3}" width="94" height="94" fill="none" stroke="${['#e8346a','#ffc233','#2fc27a','#9b6bff'][i]}" stroke-width="4"/>`);
+ if(k==3)s+='<rect x="2" y="2" width="146" height="146" fill="none" stroke="#ff8a3d" stroke-width="5"/>';return s+'</svg>'};
+const line=m=>`<div class="ln">${[1,2,3,4,5].map(n=>`<div class="sl${m[n]?' f':''}"><small>${n}</small>${m[n]?'🧒<b>'+m[n]+'</b>':'?'}</div>`).join('')}</div>`;
+const Q=[
+{n:'1',skill:'Logical reasoning',t:'Use the clues to find the number each fruit represents.',type:'num',key:[10,15,5],
+ render:()=>[['🥭🥭',20,'🥭'],['🍎🥭',25,'🍎'],['🍓🍓🍎',25,'🍓']].map((r,i)=>`<div class="scale"><span>${r[0]}</span><span class="bal">⚖️</span><b>${r[1]}</b><label>${r[2]} = <input class="num" type="number" inputmode="numeric" data-p="${i}" aria-label="Value of ${r[2]}"></label></div>`).join(''),
+ tip:v=>v[0]=='20'?'Two mangoes together make 20. Share that between them!':'',
+ hints:['Start with the scale that has only one kind of fruit.','Once you know the mango, use it in the second scale.','Two strawberries and an apple make 25. You already know the apple!'],
+ steps:[{t:'Two mangoes balance 20, so one mango is 20 ÷ 2 = 10.',v:'<div class="eq">🥭 + 🥭 = 20</div><div class="eq">🥭 = 10</div>'},
+  {t:'An apple and a mango balance 25. The mango is 10, so the apple is 25 − 10 = 15.',v:'<div class="eq">🍎 + 🥭(10) = 25</div><div class="eq">🍎 = 15</div>'},
+  {t:'Two strawberries and an apple balance 25. Two strawberries = 25 − 15 = 10, so one strawberry is 10 ÷ 2 = 5.',v:'<div class="eq">🍓 + 🍓 + 🍎(15) = 25</div><div class="eq">🍓 = 5</div>'}]},
+{n:'2',skill:'Decomposition',t:'How many squares are there in this picture?',type:'num',key:[14],
+ render:()=>'<div class="hg">'+'<i>🐴</i>'.repeat(9)+'</div><input class="num" type="number" inputmode="numeric" data-p="0" aria-label="Number of squares">',
+ hints:['Count the small squares first.','Now look for bigger squares made of 4 small ones.','Don’t forget the biggest square around everything.'],
+ steps:[{t:'Count the small 1 × 1 squares: there are 9.',v:sq(1)},{t:'Look for 2 × 2 squares: there are 4.',v:sq(2)},{t:'There is 1 big 3 × 3 square.',v:sq(3)},{t:'Add them up: 9 + 4 + 1 = 14 squares.',v:sq(0)+'<div class="eq">9 + 4 + 1 = 14</div>'}]},
+mc('3a','Find the one that is different from the others.',['✉️','☎️','✈️','🖥️'],['Letter','Telephone','Aeroplane','Computer'],2,'Letter, telephone and computer are ways to communicate. The aeroplane is for travel, so C is different.'),
+mc('3b','Find the one that is different from the others.',['🚁','🚌','🚆','📺'],['Helicopter','Bus','Train','Television'],3,'Helicopter, bus and train are used for travel. The television is not, so D is different.'),
+mc('3c','Find the one that is different from the others.',['🐔','🐘','🦌','🐄'],['Hen','Elephant','Deer','Cow'],0,'Elephant, deer and cow walk on four legs. The hen has two legs, so A is different.'),
+{n:'4',skill:'Logical reasoning',t:'Who is first? Use the clues to find each kid’s place in the ice cream line. Tap a box to mark it.',type:'grid',key:[2,1,0,4,3],
+ say:'Clue 1: Anika is not the last. Clue 2: Alisha is in the exact middle. Clue 3: The person with the shortest name is first. Clue 4: Chirag stands right behind Ellie.',
+ render:()=>'<ol class="cl"><li><b>Anika</b> is not the last to order.</li><li><b>Alisha</b> ends up in exactly the middle of the line.</li><li>The person with the shortest name is first in line.</li><li><b>Chirag</b> is <b>Ellie’s</b> big brother, so he stays right behind her in line.</li></ol><table class="lg"><tr><th>Kids</th>'+[1,2,3,4,5].map(n=>`<th>${n}</th>`).join('')+'</tr>'+N.map((n,r)=>`<tr data-p="${r}"><th>${n}</th>`+[0,1,2,3,4].map(c=>`<td tabindex="0" data-r="${r}" data-c="${c}" aria-label="${n} place ${c+1}"></td>`).join('')+'</tr>').join('')+'</table>',
+ hints:['Start with the clue that gives an exact place: who is in the middle?','Count the letters in each name to find the shortest.','Chirag and Ellie need two places side by side.'],
+ steps:[{t:'Clue 2: Alisha is in the exact middle, so she is 3rd.',v:line({3:'Alisha'})},{t:'Clue 3: Zoya has the shortest name (4 letters), so she is 1st.',v:line({1:'Zoya',3:'Alisha'})},
+  {t:'Clue 4: Chirag is right behind Ellie. Free places are 2, 4 and 5, and only 4 and 5 are side by side. So Ellie is 4th and Chirag is 5th.',v:line({1:'Zoya',3:'Alisha',4:'Ellie',5:'Chirag'})},
+  {t:'Clue 1: Anika is not last. Only place 2 is left, so Anika is 2nd.',v:line({1:'Zoya',2:'Anika',3:'Alisha',4:'Ellie',5:'Chirag'})}]}];
+
+/* ---------- Engine ---------- */
+let cur=0,st=Q.map(()=>({d:0,s:0,t:0,h:0,v:0}));
+const tot=()=>st.reduce((a,x)=>a+x.s,0),MAX=Q.length*3;
+const read={num:el=>[...el.querySelectorAll('input')].map(i=>i.value.trim()),mcq:el=>{const s=el.querySelector('.opt.sel');return[s?+s.dataset.i:-1]},grid:el=>N.map((_,r)=>[...el.querySelectorAll(`td[data-r="${r}"]`)].findIndex(t=>t.classList.contains('on')))};
+function tabs(){$('#tabs').innerHTML=[...Q.map((q,i)=>`<button class="tb${i==cur?' on':''}${st[i].d?' dn':''}" data-i="${i}" aria-label="Question ${q.n}">${q.n}</button>`),`<button class="tb${cur==Q.length?' on':''}" data-i="${Q.length}" aria-label="Results">🏆</button>`].join('');$('#stars').textContent='⭐ '+tot();$('#pv').style.visibility=cur?'visible':'hidden';$('#nx').style.visibility=cur<Q.length?'visible':'hidden';$('#nx').textContent=cur==Q.length-1?'See results ›':'Next ›'}
+function say(m){$('#say').textContent=m}
+function show(i){cur=i;speechSynthesis&&speechSynthesis.cancel();const pg=$('#pg');pg.style.animation='none';pg.offsetWidth;pg.style.animation='';tabs();
+ if(i==Q.length)return result(pg);
+ const q=Q[i],s=st[i];
+ pg.innerHTML=`<div class="meta"><span class="chip">Question ${q.n}</span><span class="chip s">${q.skill}</span><button class="ghost" id="rd">🔊 Read to me</button></div><h3>${q.t}</h3><div id="body">${q.render()}</div><div class="acts"><button class="btn" id="chk">Check my answer</button><button class="btn alt" id="hint">💡 Hint</button><button class="btn alt" id="how">👣 Show me how</button></div><div class="bot"><span>🤖</span><p id="say">${s.d?'You earned '+'⭐'.repeat(s.s)+' here. Want to see the steps?':'Take your time. You can do it!'}</p></div><div id="sol"></div>`;
+ $('#rd').onclick=()=>{if(!window.speechSynthesis)return;const u=new SpeechSynthesisUtterance(q.t+' '+(q.say||''));u.rate=.9;speechSynthesis.speak(u)};
+ $('#body').onclick=e=>{const o=e.target.closest('.opt'),c=e.target.closest('td');
+  if(o){$('#body').querySelectorAll('.opt').forEach(x=>{x.classList.remove('sel','ok','bad');x.removeAttribute('data-p')});o.classList.add('sel');o.dataset.p=0;tone(440,.08)}
+  if(c){const on=c.classList.contains('on');c.parentNode.querySelectorAll('td').forEach(x=>{x.classList.remove('on');x.textContent=''});if(!on){c.classList.add('on');c.textContent='✔'}tone(440,.08)}};
+ $('#body').onkeydown=e=>{if(e.key=='Enter'||e.key==' '){const c=e.target.closest('td');if(c){e.preventDefault();c.click()}}};
+ $('#chk').onclick=()=>check(q,s);
+ $('#hint').onclick=()=>{const h=q.hints[Math.min(s.h,q.hints.length-1)];if(!s.d&&s.h<q.hints.length)s.h++;say('💡 '+h)};
+ $('#how').onclick=()=>{if(!s.d)s.v=1;steps(q,0)}}
+function check(q,s){const el=$('#body'),a=read[q.type](el);
+ if(a.every(v=>v===''||v===-1))return say(q.type=='mcq'?'Tap a picture first, then check.':'Fill in your answer first, then check.');
+ const parts=a.map((v,i)=>+v===q.key[i]&&v!=='');s.t++;
+ el.querySelectorAll('[data-p]').forEach(n=>{n.classList.remove('ok','bad');n.classList.add(parts[n.dataset.p]?'ok':'bad')});
+ if(parts.every(Boolean)){if(!s.d){s.d=1;s.s=s.v?1:Math.max(1,3-(s.t-1)-s.h)}win();pop();say(['Brilliant! You cracked it! 🎉','Yes! Great thinking!','Super! That’s correct!'][s.t%3]+' ⭐'.repeat(s.s).replace(/ /g,''));tabs()}
+ else{oops();const r=parts.filter(Boolean).length;say((q.tip&&q.tip(a))||(parts.length>1?`${r} of ${parts.length} are right. Fix the red ones and try again.`:'Not quite. Try again, or tap Hint.'))}}
+function steps(q,k){const sl=$('#sol');sl.innerHTML=`<div class="sol"><h4>Step-by-step solution</h4><div class="viz">${q.steps[k].v}</div><ol>${q.steps.slice(0,k+1).map((x,j)=>`<li class="${j==k?'now':''}">${x.t}</li>`).join('')}</ol><div class="acts">${k?'<button class="btn alt" id="sb">‹ Previous step</button>':''}${k<q.steps.length-1?'<button class="btn" id="sn">Next step ›</button>':'<b>🎉 That’s the whole solution!</b>'}</div></div>`;
+ const b=$('#sb'),n=$('#sn');if(b)b.onclick=()=>steps(q,k-1);if(n)n.onclick=()=>{tone(520,.08);steps(q,k+1)};sl.scrollIntoView({behavior:RM?'auto':'smooth',block:'nearest'})}
+function result(pg){const sk={};Q.forEach((q,i)=>{const o=sk[q.skill]=sk[q.skill]||[0,0];o[0]+=st[i].s;o[1]+=3});const t=tot(),md=t>=15?'Gold Thinker 🥇':t>=10?'Silver Thinker 🥈':'Rising Thinker 🥉';
+ pg.innerHTML=`<h3>Chapter 1 complete!</h3><div class="eq">${md}</div><p>You collected <b>⭐ ${t} of ${MAX}</b> stars.</p>`+Object.entries(sk).map(([k,v])=>`<div>${k}: ${Math.round(v[0]/v[1]*100)}%<div class="bar"><i style="width:${v[0]/v[1]*100}%"></i></div></div>`).join('')+`<div class="bot"><span>🤖</span><p>${t<MAX?'Go back to any question to try again and earn more stars.':'Perfect score! Chapter 2 is waiting.'}</p></div><div class="acts"><button class="btn" id="re">Play again</button></div>`;
+ $('#re').onclick=()=>{st=Q.map(()=>({d:0,s:0,t:0,h:0,v:0}));show(0)};if(t>=10){win();pop()}}
+$('#tabs').onclick=e=>{const b=e.target.closest('.tb');b&&show(+b.dataset.i)};
+$('#pv').onclick=()=>show(cur-1);$('#nx').onclick=()=>show(cur+1);
+$('#snd').onclick=e=>{snd=!snd;e.target.textContent=snd?'🔊':'🔇'};
+</script></body></html>
