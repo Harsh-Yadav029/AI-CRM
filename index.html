@@ -488,12 +488,13 @@
 
     .top-bar h2 {
       margin: 0;
-      font-size: clamp(0.95rem, 3vw, 1.1rem);
+      font-size: clamp(0.92rem, 3vw, 1.1rem);
       background: var(--card);
       padding: 0.4em 1em;
       border-radius: var(--radius-pill);
       border: 2px solid var(--line);
-      white-space: nowrap;
+      line-height: 1.25;
+      max-width: 100%;
     }
     .top-bar h2 span { color: var(--acc2); }
 
@@ -783,7 +784,7 @@
 
     .ln {
       display: grid;
-      grid-template-columns: repeat(5, 1fr);
+      grid-template-columns: repeat(5, minmax(52px, 1fr));
       gap: 5px;
       overflow-x: auto;
     }
@@ -798,6 +799,23 @@
     }
     .sl.f { border: 2px solid var(--good); }
     .sl small, .sl b { display: block; font-size: 0.75rem; }
+
+    @media (max-width: 440px) {
+      .acts .btn { flex: 1 1 auto; }
+      .acts #chk { flex-basis: 100%; }
+      input.num { width: 72px; }
+      .lg { min-width: 100%; border-spacing: 3px; }
+      .lg th { padding: 6px 8px; }
+      .lg td { width: 38px; height: 38px; font-size: 1.15rem; }
+    }
+
+    @media (max-height: 520px) {
+      .cover-overlay { padding: 10px 16px 12px; }
+      .cover-actions { gap: 8px; padding-bottom: 4px; }
+      .scroll-hint { display: none; }
+      .btn.big { font-size: 1rem; padding: 0.55em 1.4em; }
+      .fitscalez-wrap { bottom: 10px; right: 14px; transform: none; }
+    }
 
     /* ========== NAV ROW ========== */
     .nav {
@@ -839,20 +857,21 @@
     /* ========== LOADING INDICATOR ========== */
     #load-indicator {
       position: fixed;
-      bottom: calc(14px + env(safe-area-inset-bottom, 0px));
+      top: calc(68px + env(safe-area-inset-top, 0px));
       left: 50%;
       transform: translateX(-50%);
       z-index: 10;
       background: var(--card);
       border: 2px solid var(--line);
       border-radius: var(--radius-pill);
-      padding: 0.4em 1.2em;
-      font-size: 0.85rem;
+      padding: 0.35em 1.1em;
+      font-size: 0.82rem;
       font-weight: 600;
       color: var(--mut);
       backdrop-filter: blur(8px);
       transition: opacity 0.4s ease;
       pointer-events: none;
+      white-space: nowrap;
     }
     #load-indicator.done { opacity: 0; }
 
@@ -985,7 +1004,7 @@
     }
 
     /* ============================================================
-       6. DRAW FRAME (cover-fit)
+       6. DRAW FRAME (cover-fit on landscape, smart-fit on portrait mobile)
     ============================================================ */
     function drawImage(img) {
       if (!img || img.naturalWidth === 0) return;
@@ -993,7 +1012,16 @@
       const nw = img.naturalWidth, nh = img.naturalHeight;
       const imgR = nw / nh, canR = cw / ch;
       let dw, dh, dx, dy;
-      if (canR > imgR) {
+      if (canR < 0.85) {
+        // Portrait phone: fit full width so robot, girl & "3" stay visible
+        const dark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+        ctx.fillStyle = dark ? '#141a3a' : '#f7f1e8';
+        ctx.fillRect(0, 0, cw, ch);
+        dw = cw;
+        dh = cw / imgR;
+        dx = 0;
+        dy = (ch - dh) / 2;
+      } else if (canR > imgR) {
         dw = cw; dh = cw / imgR; dx = 0; dy = (ch - dh) / 2;
       } else {
         dh = ch; dw = ch * imgR; dx = (cw - dw) / 2; dy = 0;
