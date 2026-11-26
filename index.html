@@ -1547,8 +1547,17 @@
   <script>
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', function () {
-        navigator.serviceWorker.register('/sw.js')
+        var hadController = !!navigator.serviceWorker.controller;
+        var reloading = false;
+        navigator.serviceWorker.addEventListener('controllerchange', function () {
+          if (hadController && !reloading) {
+            reloading = true;
+            window.location.reload();
+          }
+        });
+        navigator.serviceWorker.register('/sw.js', { updateViaCache: 'none' })
           .then(function (reg) {
+            reg.update();
             console.log('[SW] Registered, scope:', reg.scope);
           })
           .catch(function (err) {
