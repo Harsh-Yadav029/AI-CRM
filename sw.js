@@ -1,14 +1,15 @@
 // Future Tech Minds 3 - Service Worker
-// Fast-install SW: caches core shell immediately, caches frames on fetch
+// Network-first for HTML (always fresh deploys), cache-first for 359 frames
 
-const CACHE_NAME = 'ftm3-v2';
+const CACHE_NAME = 'ftm3-v3';
 
 const CORE_FILES = [
   '/',
   '/index.html',
+  '/manifest.json',
 ];
 
-// INSTALL: cache core HTML shell immediately so SW activates in <1s
+// INSTALL: cache core shell immediately so SW activates in <1s
 self.addEventListener('install', event => {
   self.skipWaiting();
   event.waitUntil(
@@ -16,7 +17,7 @@ self.addEventListener('install', event => {
   );
 });
 
-// ACTIVATE: clean up old caches and take control immediately
+// ACTIVATE: delete old caches (clears stale index.html) and take control immediately
 self.addEventListener('activate', event => {
   event.waitUntil(
     caches.keys()
@@ -25,26 +26,23 @@ self.addEventListener('activate', event => {
   );
 });
 
-// FETCH: cache-first for static assets & frames, with offline navigation fallback
+// FETCH: network-first for navigation (HTML), cache-first for frames/assets
 self.addEventListener('fetch', event => {
   if (event.request.method !== 'GET') return;
 
   const url = new URL(event.request.url);
   if (url.origin !== self.location.origin) return;
 
-  // Navigation requests (opening or refreshing the page)
+  // Navigation requests: try network first so updates appear right away, fall back to cache offline
   if (event.request.mode === 'navigate') {
     event.respondWith(
-      caches.match('/index.html', { ignoreSearch: true }).then(cached => {
-        if (cached) return cached;
-        return fetch(event.request).then(res => {
-          if (res && res.status === 200) {
-            const clone = res.clone();
-            caches.open(CACHE_NAME).then(c => c.put('/index.html', clone));
-          }
-          return res;
-        });
-      }).catch(() => caches.match('/index.html'))
+      fetch(event.request).then(res => {
+        if (res && res.status === 200) {
+          const clone = res.clone();
+          caches.open(CACHE_NAME).then(c => c.put('/index.html', clone));
+        }
+        return res;
+      }).catch(() => caches.match('/index.html', { ignoreSearch: true }))
     );
     return;
   }
