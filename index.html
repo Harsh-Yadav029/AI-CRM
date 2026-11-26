@@ -236,30 +236,18 @@
       padding-bottom: 8px;
     }
 
-    @media (max-width: 640px) {
-      .cover-actions { padding-bottom: 58px; }
-    }
-
     /* ========== POWERED BY FITSCALEZ BADGE ========== */
     .fitscalez-wrap {
       position: fixed;
-      bottom: calc(20px + env(safe-area-inset-bottom, 0px));
-      right: clamp(14px, 3vw, 32px);
+      top: 83%;
+      left: 90%;
+      transform: translate(-50%, -50%);
       z-index: 4;
       pointer-events: auto;
       display: flex;
       flex-direction: column;
-      align-items: flex-end;
+      align-items: center;
       gap: 8px;
-    }
-
-    @media (max-width: 640px) {
-      .fitscalez-wrap {
-        right: 50%;
-        transform: translateX(50%);
-        bottom: calc(14px + env(safe-area-inset-bottom, 0px));
-        align-items: center;
-      }
     }
 
     .fitscalez-badge {
@@ -814,7 +802,6 @@
       .cover-actions { gap: 8px; padding-bottom: 4px; }
       .scroll-hint { display: none; }
       .btn.big { font-size: 1rem; padding: 0.55em 1.4em; }
-      .fitscalez-wrap { bottom: 10px; right: 14px; transform: none; }
     }
 
     /* ========== NAV ROW ========== */
@@ -906,7 +893,7 @@
         <div class="scroll-hint" id="scroll-hint-btn">↓ Scroll to explore</div>
         <button class="btn big" id="open-book-btn">Open the book 📖</button>
       </div>
-      <div class="fitscalez-wrap">
+      <div class="fitscalez-wrap" id="fitscalez-wrap">
         <div class="fitscalez-pop" id="fitscalez-pop" hidden>✨ Interactive AI Learning by <b>Fitscalez</b></div>
         <button class="fitscalez-badge" id="fitscalez-btn" type="button" aria-label="Powered by Fitscalez">
           <span class="fitscalez-icon" aria-hidden="true">⚡</span>
@@ -1027,6 +1014,23 @@
         dh = ch; dw = ch * imgR; dx = (cw - dw) / 2; dy = 0;
       }
       ctx.drawImage(img, dx, dy, dw, dh);
+      positionFitscalezBadge(dx, dy, dw, dh);
+    }
+
+    function positionFitscalezBadge(dx, dy, dw, dh) {
+      const wrap = document.getElementById('fitscalez-wrap');
+      if (!wrap) return;
+      // Exact spot right below the yellow "3" (over the corner sparkle)
+      const targetX = (dx + dw * 0.90) / dpr;
+      const targetY = (dy + dh * 0.83) / dpr;
+      const vw = window.innerWidth;
+      const vh = window.innerHeight;
+      const bw = wrap.offsetWidth || 180;
+      const bh = wrap.offsetHeight || 42;
+      const clampedX = Math.max(bw / 2 + 10, Math.min(vw - bw / 2 - 10, targetX));
+      const clampedY = Math.max(bh / 2 + 10, Math.min(vh - bh / 2 - 12, targetY));
+      wrap.style.left = clampedX + 'px';
+      wrap.style.top  = clampedY + 'px';
     }
 
     function bestLoadedImage(targetIdx) {
