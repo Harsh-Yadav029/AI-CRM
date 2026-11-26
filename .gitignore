@@ -1,1 +1,17 @@
+# Ignore original JPEG frames (huge, not needed in production)
+# frames_webp/ is what gets deployed instead
+frames/
 extracted_frames_30fps.zip
+
+# Node / npm
+node_modules/
+npm-debug.log*
+package-lock.json
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Editor folders
+.vscode/
+.idea/

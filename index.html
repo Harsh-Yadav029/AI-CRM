@@ -3,9 +3,17 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="description" content="Future Tech Minds 3 – Interactive Computational Thinking for Kids">
+  <meta name="theme-color" content="#3a57e8">
   <title>Future Tech Minds 3 – Interactive Computational Thinking</title>
+
+  <!-- Preconnect for font performance -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&display=swap" rel="stylesheet">
+
   <style>
+    /* ========== TOKENS ========== */
     :root {
       --bg1: #d9f1ff;
       --bg2: #ffe6f1;
@@ -18,80 +26,103 @@
       --bad: #d23b31;
       --line: #cdd7fa;
       --tile: #eef2ff;
-      box-sizing: border-box;
+      --radius-lg: 24px;
+      --radius-pill: 99px;
+      --shadow-card: 0 14px 40px rgba(20,30,90,.18);
+      --transition-fast: 0.15s ease;
+      --transition-mid: 0.3s ease;
+      --font-base: 'Fredoka', 'Trebuchet MS', system-ui, sans-serif;
     }
 
     @media (prefers-color-scheme: dark) {
       :root:not([data-theme="light"]) {
-        --bg1: #0f1736;
-        --bg2: #2a1240;
-        --card: #18204af5;
-        --ink: #eef1ff;
-        --mut: #aab4e8;
-        --acc: #5a70ff;
-        --acc2: #e8457a;
-        --good: #3ddc97;
-        --bad: #ff7d72;
-        --line: #334088;
+        --bg1: #0f1736; --bg2: #2a1240;
+        --card: #18204af5; --ink: #eef1ff;
+        --mut: #aab4e8; --acc: #5a70ff;
+        --acc2: #e8457a; --good: #3ddc97;
+        --bad: #ff7d72; --line: #334088;
         --tile: #222c63;
       }
     }
+    :root[data-theme="dark"] {
+      --bg1: #0f1736; --bg2: #2a1240;
+      --card: #18204af5; --ink: #eef1ff;
+      --mut: #aab4e8; --acc: #5a70ff;
+      --acc2: #e8457a; --good: #3ddc97;
+      --bad: #ff7d72; --line: #334088;
+      --tile: #222c63;
+    }
 
+    /* ========== RESET ========== */
     *, *::before, *::after {
       box-sizing: border-box;
       margin: 0;
       padding: 0;
+      -webkit-tap-highlight-color: transparent;
     }
 
     html {
       width: 100%;
-      background-color: var(--bg1);
-      scroll-behavior: smooth;
+      background: var(--bg1);
+      /* Prevent overscroll flash on mobile */
+      overscroll-behavior: none;
     }
 
     body {
       width: 100%;
       min-height: 100vh;
-      font-family: 'Fredoka', 'Trebuchet MS', system-ui, sans-serif;
+      min-height: 100dvh; /* dynamic viewport for mobile browsers */
+      font-family: var(--font-base);
       color: var(--ink);
       background: linear-gradient(160deg, var(--bg1), var(--bg2)) fixed;
       overflow-x: hidden;
+      /* Smooth scroll only on desktop; on mobile let native handle it */
+      scroll-behavior: auto;
     }
 
-    [hidden] {
-      display: none !important;
-    }
+    [hidden] { display: none !important; }
 
-    /* ---------- Scroll Animation View ---------- */
+    /* ========== SCROLL ANIMATION SECTION ========== */
     #cover-view {
       position: relative;
       width: 100%;
-      min-height: 380vh;
+      /* 400vh on desktop, 500vh on mobile for more scroll room */
+      height: 400vh;
+    }
+
+    @media (max-width: 600px) {
+      #cover-view { height: 500vh; }
     }
 
     .canvas-fixed {
       position: fixed;
-      top: 0;
-      left: 0;
+      inset: 0;
       width: 100vw;
       height: 100vh;
+      height: 100dvh;
       z-index: 1;
       overflow: hidden;
       pointer-events: none;
-      transition: opacity 0.5s ease;
+      /* Use GPU compositing layer for smooth blurring */
+      will-change: opacity, filter;
+      transition: opacity 0.5s ease, filter 0.5s ease;
     }
 
     .canvas-fixed.blurred {
-      opacity: 0.15;
-      filter: blur(8px);
+      opacity: 0.12;
+      filter: blur(10px) brightness(0.6);
     }
 
     canvas {
+      display: block;
       width: 100%;
       height: 100%;
-      display: block;
+      /* Keep on GPU layer for smooth paint */
+      will-change: transform;
+      image-rendering: auto;
     }
 
+    /* ========== COVER OVERLAY ========== */
     .cover-overlay {
       position: fixed;
       inset: 0;
@@ -101,7 +132,11 @@
       flex-direction: column;
       justify-content: space-between;
       align-items: center;
-      padding: 24px 20px 32px;
+      /* Safe area insets for iPhone notch */
+      padding:
+        calc(20px + env(safe-area-inset-top, 0px))
+        20px
+        calc(28px + env(safe-area-inset-bottom, 0px));
       text-align: center;
       transition: opacity 0.4s ease;
     }
@@ -114,63 +149,90 @@
     .brand-pill {
       background: var(--card);
       border: 2px solid var(--line);
-      border-radius: 99px;
+      border-radius: var(--radius-pill);
       padding: 0.5em 1.4em;
       font-weight: 700;
-      font-size: 1.15rem;
+      font-size: clamp(0.95rem, 3vw, 1.2rem);
       color: var(--ink);
-      box-shadow: 0 8px 24px rgba(20, 30, 90, 0.15);
-      backdrop-filter: blur(8px);
-    }
-    .brand-pill b {
-      color: var(--acc2);
-    }
-
-    .scroll-hint {
-      background: var(--card);
-      border: 2px solid var(--line);
-      border-radius: 99px;
-      padding: 0.5em 1.2em;
-      font-weight: 600;
-      font-size: 0.95rem;
-      color: var(--mut);
-      animation: bob 1.8s infinite;
-      box-shadow: 0 6px 18px rgba(0, 0, 0, 0.1);
-      backdrop-filter: blur(8px);
+      box-shadow: 0 6px 20px rgba(20,30,90,.12);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
       pointer-events: auto;
-      cursor: pointer;
     }
+    .brand-pill b { color: var(--acc2); }
 
     .cover-actions {
       display: flex;
       flex-direction: column;
       align-items: center;
-      gap: 12px;
+      gap: 14px;
       pointer-events: auto;
+      /* Pull up slightly from bottom */
+      padding-bottom: 8px;
     }
 
-    /* ---------- Buttons & UI Components ---------- */
+    .scroll-hint {
+      background: var(--card);
+      border: 2px solid var(--line);
+      border-radius: var(--radius-pill);
+      padding: 0.55em 1.3em;
+      font-weight: 600;
+      font-size: clamp(0.85rem, 2.5vw, 1rem);
+      color: var(--mut);
+      animation: bob 2s ease-in-out infinite;
+      box-shadow: 0 4px 14px rgba(0,0,0,.08);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      pointer-events: auto;
+      cursor: pointer;
+      touch-action: manipulation;
+    }
+
+    /* ========== PROGRESS BAR (Scroll indicator) ========== */
+    #scroll-progress-bar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      height: 4px;
+      width: 0%;
+      background: linear-gradient(90deg, var(--acc2), var(--acc));
+      z-index: 10;
+      border-radius: 0 2px 2px 0;
+      pointer-events: none;
+      transition: width 0.1s linear;
+      will-change: width;
+    }
+
+    /* ========== BUTTONS ========== */
     .btn {
       font: inherit;
       font-weight: 700;
       border: 0;
-      border-radius: 99px;
-      padding: 0.65em 1.3em;
+      border-radius: var(--radius-pill);
+      padding: 0.7em 1.4em;
       background: var(--acc);
       color: #fff;
       cursor: pointer;
-      box-shadow: 0 4px 0 rgba(0, 0, 0, 0.22);
-      transition: transform 0.15s, background-color 0.2s;
+      box-shadow: 0 4px 0 rgba(0,0,0,.2);
+      transition: transform var(--transition-fast), box-shadow var(--transition-fast);
+      touch-action: manipulation;
+      /* Min touch target 44px */
+      min-height: 44px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      white-space: nowrap;
     }
 
-    .btn:active {
-      transform: translateY(2px);
-    }
+    .btn:hover { transform: translateY(-2px); box-shadow: 0 6px 0 rgba(0,0,0,.18); }
+    .btn:active { transform: translateY(2px); box-shadow: 0 1px 0 rgba(0,0,0,.18); }
 
-    .btn:focus-visible, .opt:focus-visible, .tb:focus-visible, td:focus-visible, input:focus-visible {
-      outline: 3px solid var(--acc2);
-      outline-offset: 2px;
-    }
+    .btn:focus-visible,
+    .opt:focus-visible,
+    .tb:focus-visible,
+    td:focus-visible,
+    input:focus-visible { outline: 3px solid var(--acc2); outline-offset: 2px; }
 
     .btn.alt {
       background: var(--tile);
@@ -178,22 +240,19 @@
       border: 2px solid var(--line);
       box-shadow: none;
     }
-
-    .btn.alt:hover {
-      background: var(--card);
-    }
+    .btn.alt:hover { background: var(--card); transform: translateY(-1px); box-shadow: none; }
 
     .btn.big {
-      font-size: 1.35rem;
-      padding: 0.75em 1.8em;
+      font-size: clamp(1.1rem, 4vw, 1.4rem);
+      padding: 0.75em 2em;
       background: var(--acc2);
-      animation: bob 1.6s infinite;
-      box-shadow: 0 6px 0 rgba(0, 0, 0, 0.25);
+      animation: bob 1.6s ease-in-out infinite;
+      box-shadow: 0 6px 0 rgba(0,0,0,.22);
     }
 
     @keyframes bob {
       0%, 100% { transform: translateY(0); }
-      50% { transform: translateY(-7px); }
+      50%       { transform: translateY(-6px); }
     }
 
     .ghost {
@@ -201,39 +260,41 @@
       background: var(--card);
       border: 2px solid var(--line);
       color: var(--ink);
-      border-radius: 99px;
-      padding: 0.35em 0.9em;
+      border-radius: var(--radius-pill);
+      padding: 0.4em 1em;
       cursor: pointer;
       font-weight: 600;
-      transition: background 0.2s;
+      transition: background var(--transition-fast);
+      touch-action: manipulation;
+      min-height: 40px;
+      display: inline-flex;
+      align-items: center;
+      white-space: nowrap;
     }
+    .ghost:hover { background: var(--tile); }
 
-    .ghost:hover {
-      background: var(--tile);
-    }
-
-    /* ---------- Interactive Book Section ---------- */
+    /* ========== BOOK SECTION ========== */
     #book-section {
       position: relative;
       z-index: 5;
       min-height: 100vh;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: flex-start;
-      padding: 24px 14px 60px;
+      min-height: 100dvh;
+      padding:
+        calc(16px + env(safe-area-inset-top, 0px))
+        clamp(10px, 3vw, 20px)
+        calc(60px + env(safe-area-inset-bottom, 0px));
     }
 
     #book {
       width: 100%;
-      max-width: 800px;
+      max-width: 820px;
       margin: 0 auto;
-      animation: fi 0.6s ease-out;
+      animation: fi 0.55s cubic-bezier(0.3, 0.8, 0.4, 1) both;
     }
 
     @keyframes fi {
-      from { opacity: 0; transform: translateY(18px); }
-      to { opacity: 1; transform: translateY(0); }
+      from { opacity: 0; transform: translateY(20px); }
+      to   { opacity: 1; transform: translateY(0); }
     }
 
     .top-bar {
@@ -242,32 +303,32 @@
       gap: 10px;
       justify-content: space-between;
       flex-wrap: wrap;
+      row-gap: 8px;
       margin-bottom: 12px;
     }
 
     .top-bar h2 {
       margin: 0;
-      font-size: 1.15rem;
+      font-size: clamp(0.95rem, 3vw, 1.1rem);
       background: var(--card);
-      padding: 0.4em 0.9em;
-      border-radius: 99px;
+      padding: 0.4em 1em;
+      border-radius: var(--radius-pill);
       border: 2px solid var(--line);
+      white-space: nowrap;
     }
-
-    .top-bar h2 span {
-      color: var(--acc2);
-    }
+    .top-bar h2 span { color: var(--acc2); }
 
     .top-controls {
       display: flex;
       align-items: center;
       gap: 8px;
+      flex-wrap: wrap;
     }
 
     .pill {
       background: var(--card);
       border: 2px solid var(--line);
-      border-radius: 99px;
+      border-radius: var(--radius-pill);
       padding: 0.35em 0.9em;
       font-weight: 700;
       white-space: nowrap;
@@ -277,48 +338,49 @@
       display: flex;
       gap: 8px;
       overflow-x: auto;
-      padding: 10px 2px 16px;
+      padding: 10px 2px 14px;
+      scrollbar-width: none;
+      -ms-overflow-style: none;
+      /* Smooth scroll snap on mobile */
+      scroll-snap-type: x mandatory;
+      -webkit-overflow-scrolling: touch;
     }
+    #tabs::-webkit-scrollbar { display: none; }
 
     .tb {
       font: inherit;
       font-weight: 700;
       min-width: 44px;
+      width: 44px;
       height: 44px;
       border-radius: 50%;
       border: 2px solid var(--line);
       background: var(--card);
       color: var(--ink);
       cursor: pointer;
-      transition: transform 0.2s, background 0.2s;
+      transition: transform var(--transition-fast), background var(--transition-fast);
+      flex-shrink: 0;
+      scroll-snap-align: start;
+      touch-action: manipulation;
     }
 
-    .tb.dn {
-      background: var(--good);
-      color: #fff;
-      border-color: var(--good);
-    }
+    .tb.dn { background: var(--good); color: #fff; border-color: var(--good); }
+    .tb.on { background: var(--acc); color: #fff; border-color: var(--acc); transform: scale(1.12); }
 
-    .tb.on {
-      background: var(--acc);
-      color: #fff;
-      border-color: var(--acc);
-      transform: scale(1.1);
-    }
-
+    /* ========== QUESTION CARD ========== */
     .page {
       background: var(--card);
-      border-radius: 26px;
-      padding: 24px;
-      box-shadow: 0 16px 45px rgba(20, 30, 90, 0.2);
+      border-radius: var(--radius-lg);
+      padding: clamp(14px, 4vw, 26px);
+      box-shadow: var(--shadow-card);
       transform-origin: left center;
-      animation: flip 0.65s cubic-bezier(0.2, 0.8, 0.3, 1);
-      border: 1px solid rgba(255, 255, 255, 0.4);
+      animation: flip 0.6s cubic-bezier(0.25, 0.85, 0.3, 1) both;
+      border: 1px solid rgba(255,255,255,.35);
     }
 
     @keyframes flip {
-      from { transform: perspective(1200px) rotateY(-35deg); opacity: 0; }
-      to { transform: perspective(1200px) rotateY(0deg); opacity: 1; }
+      from { transform: perspective(1200px) rotateY(-28deg); opacity: 0; }
+      to   { transform: perspective(1200px) rotateY(0deg);   opacity: 1; }
     }
 
     .meta {
@@ -326,99 +388,75 @@
       gap: 8px;
       align-items: center;
       flex-wrap: wrap;
-      margin-bottom: 8px;
+      margin-bottom: 10px;
     }
 
     .chip {
       background: var(--tile);
-      border-radius: 99px;
-      padding: 0.25em 0.85em;
+      border-radius: var(--radius-pill);
+      padding: 0.2em 0.8em;
       font-weight: 700;
-      font-size: 0.9rem;
+      font-size: 0.88rem;
     }
-
-    .chip.s {
-      color: var(--acc2);
-      margin-right: auto;
-    }
+    .chip.s { color: var(--acc2); margin-right: auto; }
 
     h3 {
-      font-size: 1.3rem;
-      margin: 0.7em 0;
-      line-height: 1.35;
-      max-width: 60ch;
+      font-size: clamp(1.05rem, 3.5vw, 1.3rem);
+      margin: 0.6em 0;
+      line-height: 1.4;
+      max-width: 58ch;
     }
 
+    /* ========== FRUIT BALANCE SCALE ========== */
     .scale {
       display: flex;
       align-items: center;
-      gap: 12px;
+      gap: 10px;
       flex-wrap: wrap;
       background: var(--tile);
       border-radius: 18px;
-      padding: 12px 16px;
+      padding: 10px 14px;
       margin: 10px 0;
-      font-size: 1.6rem;
+      font-size: clamp(1.2rem, 4vw, 1.6rem);
     }
-
-    .scale .bal {
-      font-size: 2.2rem;
-    }
-
-    .scale b {
-      background: var(--card);
-      border-radius: 12px;
-      padding: 0 0.5em;
-    }
-
-    .scale label {
-      margin-left: auto;
-      font-weight: 700;
-    }
+    .scale .bal { font-size: 1.8em; }
+    .scale b { background: var(--card); border-radius: 10px; padding: 0 0.45em; }
+    .scale label { margin-left: auto; font-weight: 700; }
 
     input.num {
-      width: 86px;
+      width: 80px;
       font: inherit;
-      font-size: 1.4rem;
+      font-size: clamp(1.1rem, 4vw, 1.4rem);
       text-align: center;
       border: 3px solid var(--line);
-      border-radius: 14px;
-      padding: 0.25em;
+      border-radius: 12px;
+      padding: 0.2em;
       background: var(--card);
       color: var(--ink);
+      touch-action: manipulation;
     }
+    input.num.ok  { border-color: var(--good); }
+    input.num.bad { border-color: var(--bad); }
 
-    input.num.ok {
-      border-color: var(--good);
-    }
-
-    input.num.bad {
-      border-color: var(--bad);
-    }
-
+    /* ========== SQUARE GRID ========== */
     .hg {
       display: grid;
-      grid-template-columns: repeat(3, 68px);
+      grid-template-columns: repeat(3, clamp(52px, 12vw, 68px));
       width: max-content;
       margin: 12px 0;
       border: 3px solid var(--mut);
-      font-size: 2rem;
+      font-size: clamp(1.4rem, 5vw, 2rem);
       text-align: center;
       border-radius: 8px;
       overflow: hidden;
     }
+    .hg i { font-style: normal; border: 1px solid var(--mut); padding: 8px 0; background: var(--tile); }
 
-    .hg i {
-      font-style: normal;
-      border: 1px solid var(--mut);
-      padding: 8px 0;
-      background: var(--tile);
-    }
-
+    /* ========== MCQ OPTIONS ========== */
     .ops {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
-      gap: 14px;
+      grid-template-columns: repeat(auto-fit, minmax(min(130px, 40%), 1fr));
+      gap: 12px;
       margin: 12px 0;
     }
 
@@ -428,226 +466,185 @@
       background: var(--tile);
       border: 3px solid var(--line);
       border-radius: 20px;
-      padding: 14px 8px;
+      padding: clamp(10px, 3vw, 14px) 8px;
       cursor: pointer;
-      position: relative;
       display: flex;
       flex-direction: column;
       align-items: center;
       gap: 6px;
-      transition: transform 0.2s, border-color 0.2s;
+      transition: transform 0.18s, border-color 0.18s, background 0.18s;
+      touch-action: manipulation;
+      /* Prevent long-press context menu on mobile */
+      user-select: none;
+      -webkit-user-select: none;
     }
-
-    .opt:hover {
-      transform: translateY(-4px) rotate(-1deg);
-    }
-
-    .opt .em {
-      font-size: 3rem;
-      line-height: 1.1;
-    }
-
+    .opt:hover { transform: translateY(-4px) rotate(-1deg); }
+    .opt .em { font-size: clamp(2rem, 7vw, 3rem); line-height: 1.1; }
     .opt .lt {
       font-weight: 700;
       background: var(--card);
       border-radius: 50%;
-      width: 32px;
-      height: 32px;
-      line-height: 32px;
+      width: 30px;
+      height: 30px;
+      line-height: 30px;
+      text-align: center;
     }
+    .opt.sel { border-color: var(--acc); background: var(--card); }
+    .opt.ok  { border-color: var(--good); background: var(--card); }
+    .opt.bad { border-color: var(--bad); }
+    .opt.hl  { border-color: var(--good); transform: scale(1.06); }
+    .opt.dim { opacity: 0.45; }
+    .ops.st  { pointer-events: none; }
 
-    .opt.sel {
-      border-color: var(--acc);
-      background: var(--card);
-    }
-
-    .opt.ok {
-      border-color: var(--good);
-      background: var(--card);
-    }
-
-    .opt.bad {
-      border-color: var(--bad);
-    }
-
-    .opt.hl {
-      border-color: var(--good);
-      transform: scale(1.06);
-    }
-
-    .opt.dim {
-      opacity: 0.45;
-    }
-
-    .ops.st {
-      pointer-events: none;
-    }
-
+    /* ========== CLUES LIST ========== */
     ol.cl {
       padding-left: 1.4em;
-      line-height: 1.6;
-      max-width: 60ch;
+      line-height: 1.65;
+      max-width: 58ch;
       margin: 10px 0;
+      font-size: clamp(0.95rem, 3vw, 1.1rem);
     }
+
+    /* ========== LINE GRID (Q4) ========== */
+    /* Make the ice cream grid scroll horizontally on small screens */
+    .lg-wrapper {
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+      scrollbar-width: none;
+    }
+    .lg-wrapper::-webkit-scrollbar { display: none; }
 
     .lg {
       border-collapse: separate;
-      border-spacing: 5px;
-      margin: 12px 0;
-      width: 100%;
-      max-width: 520px;
+      border-spacing: 4px;
+      margin: 10px 0;
+      min-width: 340px;
     }
-
     .lg th {
       background: var(--tile);
       border-radius: 10px;
-      padding: 8px 12px;
+      padding: 7px 10px;
       text-align: left;
+      white-space: nowrap;
+      font-size: clamp(0.85rem, 2.5vw, 1rem);
     }
-
-    .lg tr.ok th {
-      background: var(--good);
-      color: #fff;
-    }
-
-    .lg tr.bad th {
-      background: var(--bad);
-      color: #fff;
-    }
-
+    .lg tr.ok  th { background: var(--good); color: #fff; }
+    .lg tr.bad th { background: var(--bad);  color: #fff; }
     .lg td {
-      width: 48px;
-      height: 44px;
+      width: 44px;
+      height: 42px;
       background: var(--tile);
       border-radius: 10px;
       cursor: pointer;
       text-align: center;
-      font-size: 1.4rem;
+      font-size: 1.3rem;
       color: var(--good);
       border: 2px solid var(--line);
       user-select: none;
+      -webkit-user-select: none;
+      touch-action: manipulation;
     }
+    .lg td.on { background: var(--card); border-color: var(--acc); }
 
-    .lg td.on {
-      background: var(--card);
-      border-color: var(--acc);
-    }
-
+    /* ========== ACTION BUTTONS ROW ========== */
     .acts {
       display: flex;
       gap: 10px;
       flex-wrap: wrap;
-      margin: 18px 0;
+      margin: 16px 0;
       align-items: center;
     }
 
+    /* ========== ROBOT ASSISTANT ========== */
     .bot {
       display: flex;
       gap: 12px;
-      align-items: center;
-      margin-top: 10px;
+      align-items: flex-start;
+      margin-top: 12px;
     }
-
     .bot > span {
-      font-size: 2.4rem;
-      animation: bob 2.4s infinite;
+      font-size: clamp(1.8rem, 6vw, 2.4rem);
+      animation: bob 2.4s ease-in-out infinite;
+      flex-shrink: 0;
     }
-
     .bot p {
       margin: 0;
       background: var(--tile);
       border-radius: 6px 20px 20px 20px;
-      padding: 0.7em 1.2em;
+      padding: 0.6em 1em;
       font-weight: 600;
+      font-size: clamp(0.9rem, 3vw, 1rem);
+      flex: 1;
     }
 
+    /* ========== STEP-BY-STEP SOLUTION ========== */
     .sol {
       margin-top: 16px;
       border: 3px dashed var(--acc);
       border-radius: 20px;
-      padding: 16px;
-      background: rgba(58, 87, 232, 0.04);
+      padding: clamp(12px, 3vw, 18px);
+      background: rgba(58,87,232,.03);
     }
-
-    .sol h4 {
-      margin: 0 0 10px;
-    }
-
+    .sol h4 { margin: 0 0 10px; font-size: 1rem; }
     .viz {
       background: var(--tile);
-      border-radius: 16px;
-      padding: 14px;
+      border-radius: 14px;
+      padding: 12px;
       text-align: center;
-      font-size: 1.5rem;
+      font-size: clamp(1.1rem, 4vw, 1.5rem);
       margin-bottom: 10px;
+      overflow-x: auto;
     }
+    .sol li { margin: 0.35em 0; opacity: 0.65; font-size: clamp(0.9rem, 3vw, 1rem); }
+    .sol li.now { opacity: 1; font-weight: 700; }
 
-    .sol li {
-      margin: 0.4em 0;
-      opacity: 0.7;
-    }
-
-    .sol li.now {
-      opacity: 1;
-      font-weight: 700;
-    }
-
-    .eq {
-      font-size: 1.6rem;
-      font-weight: 700;
-      margin: 6px 0;
-    }
-
-    .sqv {
-      width: 170px;
-      height: 170px;
-    }
+    /* ========== MISC ELEMENTS ========== */
+    .eq   { font-size: clamp(1.2rem, 4vw, 1.6rem); font-weight: 700; margin: 6px 0; }
+    .sqv  { width: clamp(130px, 35vw, 170px); height: clamp(130px, 35vw, 170px); }
 
     .ln {
       display: grid;
       grid-template-columns: repeat(5, 1fr);
-      gap: 6px;
+      gap: 5px;
+      overflow-x: auto;
     }
-
     .sl {
       background: var(--card);
       border: 2px dashed var(--line);
       border-radius: 12px;
       padding: 6px 2px;
-      font-size: 1.4rem;
-      min-height: 84px;
+      font-size: clamp(1rem, 4vw, 1.4rem);
+      min-height: 76px;
+      text-align: center;
     }
+    .sl.f { border: 2px solid var(--good); }
+    .sl small, .sl b { display: block; font-size: 0.75rem; }
 
-    .sl.f {
-      border: 2px solid var(--good);
-    }
-
-    .sl small, .sl b {
-      display: block;
-      font-size: 0.8rem;
-    }
-
+    /* ========== NAV ROW ========== */
     .nav {
       display: flex;
       justify-content: space-between;
       margin-top: 16px;
+      gap: 10px;
     }
 
+    /* ========== RESULT BARS ========== */
     .bar {
-      height: 16px;
+      height: 14px;
       background: var(--tile);
-      border-radius: 99px;
+      border-radius: var(--radius-pill);
       overflow: hidden;
-      margin: 6px 0 14px;
+      margin: 5px 0 12px;
     }
-
     .bar i {
       display: block;
       height: 100%;
-      background: var(--good);
-      border-radius: 99px;
+      background: linear-gradient(90deg, var(--good), #3ddc97);
+      border-radius: var(--radius-pill);
+      transition: width 0.6s ease;
     }
 
+    /* ========== CONFETTI ========== */
     .cf {
       position: fixed;
       top: -30px;
@@ -656,45 +653,71 @@
       pointer-events: none;
       animation: fall 1.8s ease-in forwards;
     }
-
     @keyframes fall {
       to { transform: translate(var(--dx), 105vh) rotate(540deg); }
     }
 
+    /* ========== LOADING INDICATOR ========== */
+    #load-indicator {
+      position: fixed;
+      bottom: calc(14px + env(safe-area-inset-bottom, 0px));
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 10;
+      background: var(--card);
+      border: 2px solid var(--line);
+      border-radius: var(--radius-pill);
+      padding: 0.4em 1.2em;
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: var(--mut);
+      backdrop-filter: blur(8px);
+      transition: opacity 0.4s ease;
+      pointer-events: none;
+    }
+    #load-indicator.done { opacity: 0; }
+
+    /* ========== REDUCED MOTION ========== */
     @media (prefers-reduced-motion: reduce) {
       *, *::before, *::after {
-        animation: none !important;
-        transition: none !important;
+        animation-duration: 0.001s !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.001s !important;
       }
     }
   </style>
 </head>
 <body>
 
-  <!-- Background 359-Frame Animation Canvas -->
+  <!-- Scroll progress indicator bar at top -->
+  <div id="scroll-progress-bar"></div>
+
+  <!-- Full-screen animation canvas (always present) -->
   <div class="canvas-fixed" id="canvas-fixed">
     <canvas id="anim-canvas"></canvas>
   </div>
 
-  <!-- Landing Cover with Scroll Scrubbing -->
+  <!-- Loading indicator -->
+  <div id="load-indicator">Loading animation… 0%</div>
+
+  <!-- SECTION 1: Cinematic Scroll Cover -->
   <section id="cover-view">
     <div class="cover-overlay" id="cover-overlay">
-      <div class="brand-pill">Brainwave’s <b>Future Tech Minds 3</b></div>
-
+      <div class="brand-pill">Brainwave's <b>Future Tech Minds 3</b></div>
       <div class="cover-actions">
-        <div class="scroll-hint" id="scroll-hint-btn">Scroll down to play animation ⬇</div>
+        <div class="scroll-hint" id="scroll-hint-btn">↓ Scroll to explore</div>
         <button class="btn big" id="open-book-btn">Open the book 📖</button>
       </div>
     </div>
   </section>
 
-  <!-- Interactive Question Book Section -->
+  <!-- SECTION 2: Interactive Question Book -->
   <section id="book-section" hidden>
     <div id="book">
       <div class="top-bar">
         <h2>Chapter 1: <span>Future Ready Thinking</span></h2>
         <div class="top-controls">
-          <button class="ghost" id="rewatch-btn" title="Back to cover animation">🎬 Cover</button>
+          <button class="ghost" id="rewatch-btn">🎬 Cover</button>
           <span class="pill" id="stars">⭐ 0</span>
           <button class="ghost" id="snd" aria-label="Toggle sound">🔊</button>
         </div>
@@ -711,545 +734,579 @@
   </section>
 
   <script>
-    (function () {
-      const TOTAL_FRAMES = 359;
-      const canvas = document.getElementById('anim-canvas');
-      const ctx = canvas.getContext('2d', { alpha: false });
-      const coverView = document.getElementById('cover-view');
-      const coverOverlay = document.getElementById('cover-overlay');
-      const bookSection = document.getElementById('book-section');
-      const canvasFixed = document.getElementById('canvas-fixed');
-      const openBookBtn = document.getElementById('open-book-btn');
-      const rewatchBtn = document.getElementById('rewatch-btn');
-      const scrollHintBtn = document.getElementById('scroll-hint-btn');
+  (function () {
+    'use strict';
 
-      const images = new Array(TOTAL_FRAMES);
-      let targetProgress = 0;
-      let currentProgress = 0;
-      let lastRenderedImg = null;
-      let isBookOpen = false;
-
-      function getFrameSrc(index) {
-        const padded = String(index + 1).padStart(6, '0');
-        return `frames/frame_${padded}.jpg`;
-      }
-
-      function resize() {
-        const dpr = Math.min(window.devicePixelRatio || 1, 2);
-        const w = window.innerWidth;
-        const h = window.innerHeight;
-
-        canvas.width = Math.round(w * dpr);
-        canvas.height = Math.round(h * dpr);
-
-        ctx.imageSmoothingEnabled = true;
-        ctx.imageSmoothingQuality = 'high';
-
-        lastRenderedImg = null;
-        render();
-      }
-
-      function drawImageToCanvas(img) {
-        if (!img || !img.complete || img.naturalWidth === 0) return;
-
-        const cw = canvas.width;
-        const ch = canvas.height;
-        const nw = img.naturalWidth;
-        const nh = img.naturalHeight;
-
-        const imgRatio = nw / nh;
-        const canvasRatio = cw / ch;
-
-        let drawW, drawH, drawX, drawY;
-
-        if (canvasRatio > imgRatio) {
-          drawW = cw;
-          drawH = cw / imgRatio;
-          drawX = 0;
-          drawY = (ch - drawH) / 2;
-        } else {
-          drawH = ch;
-          drawW = ch * imgRatio;
-          drawX = (cw - drawW) / 2;
-          drawY = 0;
-        }
-
-        ctx.drawImage(img, drawX, drawY, drawW, drawH);
-        lastRenderedImg = img;
-      }
-
-      function getClosestLoadedImage(targetIdx) {
-        for (let offset = 1; offset < TOTAL_FRAMES; offset++) {
-          const prev = targetIdx - offset;
-          if (prev >= 0 && images[prev] && images[prev].complete && images[prev].naturalWidth > 0) {
-            return images[prev];
-          }
-          const next = targetIdx + offset;
-          if (next < TOTAL_FRAMES && images[next] && images[next].complete && images[next].naturalWidth > 0) {
-            return images[next];
-          }
-        }
-        return null;
-      }
-
-      function render() {
-        const targetIdx = Math.min(
-          TOTAL_FRAMES - 1,
-          Math.max(0, Math.round(currentProgress * (TOTAL_FRAMES - 1)))
-        );
-
-        const img = images[targetIdx];
-        if (img && img.complete && img.naturalWidth > 0) {
-          if (lastRenderedImg !== img) {
-            drawImageToCanvas(img);
-          }
-        } else {
-          const fallback = getClosestLoadedImage(targetIdx);
-          if (fallback && lastRenderedImg !== fallback) {
-            drawImageToCanvas(fallback);
-          }
-        }
-      }
-
-      function updateScroll() {
-        if (isBookOpen) return;
-        const scrollTop = window.scrollY || window.pageYOffset || document.documentElement.scrollTop || 0;
-        const maxScroll = coverView.offsetHeight - window.innerHeight;
-        targetProgress = maxScroll > 0 ? Math.min(Math.max(scrollTop / maxScroll, 0), 1) : 0;
-
-        // If the child scrolls all the way to the bottom of the animation track, prompt opening
-        if (targetProgress >= 0.98) {
-          openBookBtn.style.transform = 'scale(1.15)';
-        } else {
-          openBookBtn.style.transform = 'scale(1)';
-        }
-      }
-
-      function tick() {
-        if (!isBookOpen) {
-          const diff = targetProgress - currentProgress;
-          if (Math.abs(diff) > 0.0001) {
-            currentProgress += diff * 0.22;
-          } else {
-            currentProgress = targetProgress;
-          }
-          render();
-        }
-        requestAnimationFrame(tick);
-      }
-
-      function initImages() {
-        const firstImg = new Image();
-        firstImg.src = getFrameSrc(0);
-        firstImg.onload = function () {
-          images[0] = firstImg;
-          render();
-        };
-        images[0] = firstImg;
-
-        for (let i = 1; i < TOTAL_FRAMES; i++) {
-          const img = new Image();
-          img.src = getFrameSrc(i);
-          img.onload = function () {
-            images[i] = img;
-            const currentIdx = Math.round(currentProgress * (TOTAL_FRAMES - 1));
-            if (Math.abs(currentIdx - i) <= 2) {
-              render();
-            }
-          };
-          images[i] = img;
-        }
-      }
-
-      function openBook() {
-        isBookOpen = true;
-        coverView.hidden = true;
-        coverOverlay.classList.add('hide');
-        bookSection.hidden = false;
-        canvasFixed.classList.add('blurred');
-        window.scrollTo({ top: 0, behavior: 'smooth' });
-        tone(660, 0.15);
-        show(0);
-      }
-
-      function closeBookToCover() {
-        isBookOpen = false;
-        bookSection.hidden = true;
-        coverView.hidden = false;
-        coverOverlay.classList.remove('hide');
-        canvasFixed.classList.remove('blurred');
-        render();
-        window.scrollTo({ top: 0, behavior: 'smooth' });
-      }
-
-      openBookBtn.onclick = openBook;
-      rewatchBtn.onclick = closeBookToCover;
-      scrollHintBtn.onclick = () => {
-        window.scrollBy({ top: window.innerHeight * 0.9, behavior: 'smooth' });
-      };
-
-      window.addEventListener('resize', resize, { passive: true });
-      window.addEventListener('scroll', updateScroll, { passive: true });
-      window.addEventListener('wheel', updateScroll, { passive: true });
-      window.addEventListener('touchmove', updateScroll, { passive: true });
-
-      resize();
-      initImages();
-      updateScroll();
-      requestAnimationFrame(tick);
-
-      /* ---------- Sound & Audio Synthesis ---------- */
-      let AC = null, snd = 1;
-      function tone(f, d = 0.15, w = 0) {
-        if (!snd) return;
-        try {
-          AC = AC || new (window.AudioContext || window.webkitAudioContext)();
-          const o = AC.createOscillator(), g = AC.createGain(), n = AC.currentTime + w;
-          o.frequency.value = f;
-          o.type = 'triangle';
-          g.gain.setValueAtTime(0.15, n);
-          g.gain.exponentialRampToValueAtTime(0.001, n + d);
-          o.connect(g);
-          g.connect(AC.destination);
-          o.start(n);
-          o.stop(n + d);
-        } catch (e) {}
-      }
-
-      const win = () => [523, 659, 784].forEach((f, i) => tone(f, 0.2, i * 0.1));
-      const oops = () => tone(200, 0.3);
-
-      function pop() {
-        for (let i = 0; i < 28; i++) {
-          const s = document.createElement('span');
-          s.className = 'cf';
-          s.textContent = ['⭐', '🎉', '✨', '🎈'][i % 4];
-          s.style.cssText = `left:${Math.random() * 100}vw;--dx:${(Math.random() - 0.5) * 220}px;animation-delay:${Math.random() * 0.3}s`;
-          document.body.append(s);
-          setTimeout(() => s.remove(), 2300);
-        }
-      }
-
-      /* ---------- Question Bank ---------- */
-      const N = ['Alisha', 'Anika', 'Zoya', 'Chirag', 'Ellie'];
-      const tiles = (em, nm, hl, show) =>
-        `<div class="ops${hl == null ? '' : ' st'}">` +
-        em.map((e, i) => `<button class="opt${hl == null ? '' : i == hl ? ' hl' : ' dim'}" data-i="${i}"><span class="em">${e}</span><span class="lt">${'ABCD'[i]}</span>${show ? `<small>${nm[i]}</small>` : ''}</button>`).join('') +
-        '</div>';
-
-      const mc = (n, t, em, nm, a, why) => ({
-        n,
-        skill: 'Classification',
-        t,
-        type: 'mcq',
-        key: [a],
-        render: () => tiles(em, nm),
-        hints: ['Say the name of each picture out loud.', 'Three pictures belong to the same group. What do they do?'],
-        steps: [
-          { t: 'Name each picture.', v: tiles(em, nm, -1, 1).replace(/hl|dim/g, '') },
-          { t: why, v: tiles(em, nm, a, 1) }
-        ]
-      });
-
-      const sq = (k) => {
-        let s = '<svg viewBox="-4 -4 158 158" class="sqv" role="img" aria-label="3 by 3 grid">';
-        for (let i = 0; i < 9; i++) {
-          s += `<rect x="${(i % 3) * 50}" y="${~~(i / 3) * 50}" width="50" height="50" fill="${k == 1 ? '#3a57e8' : '#8899dd'}" fill-opacity="${k == 1 ? 0.55 : 0.25}" stroke="#56628f"/>`;
-        }
-        if (k == 2) {
-          [[0, 0], [50, 0], [0, 50], [50, 50]].forEach((p, i) => {
-            s += `<rect x="${p[0] + 3}" y="${p[1] + 3}" width="94" height="94" fill="none" stroke="${['#e8346a', '#ffc233', '#2fc27a', '#9b6bff'][i]}" stroke-width="4"/>`;
-          });
-        }
-        if (k == 3) {
-          s += '<rect x="2" y="2" width="146" height="146" fill="none" stroke="#ff8a3d" stroke-width="5"/>';
-        }
-        return s + '</svg>';
-      };
-
-      const line = (m) =>
-        `<div class="ln">${[1, 2, 3, 4, 5].map(n => `<div class="sl${m[n] ? ' f' : ''}"><small>${n}</small>${m[n] ? '🧒<b>' + m[n] + '</b>' : '?'}</div>`).join('')}</div>`;
-
-      const Q = [
-        {
-          n: '1',
-          skill: 'Logical reasoning',
-          t: 'Use the clues to find the number each fruit represents.',
-          type: 'num',
-          key: [10, 15, 5],
-          render: () =>
-            [['🥭🥭', 20, '🥭'], ['🍎🥭', 25, '🍎'], ['🍓🍓🍎', 25, '🍓']]
-              .map((r, i) => `<div class="scale"><span>${r[0]}</span><span class="bal">⚖️</span><b>${r[1]}</b><label>${r[2]} = <input class="num" type="number" inputmode="numeric" data-p="${i}" aria-label="Value of ${r[2]}"></label></div>`)
-              .join(''),
-          tip: (v) => v[0] == '20' ? 'Two mangoes together make 20. Share that between them!' : '',
-          hints: [
-            'Start with the scale that has only one kind of fruit.',
-            'Once you know the mango, use it in the second scale.',
-            'Two strawberries and an apple make 25. You already know the apple!'
-          ],
-          steps: [
-            { t: 'Two mangoes balance 20, so one mango is 20 ÷ 2 = 10.', v: '<div class="eq">🥭 + 🥭 = 20</div><div class="eq">🥭 = 10</div>' },
-            { t: 'An apple and a mango balance 25. The mango is 10, so the apple is 25 − 10 = 15.', v: '<div class="eq">🍎 + 🥭(10) = 25</div><div class="eq">🍎 = 15</div>' },
-            { t: 'Two strawberries and an apple balance 25. Two strawberries = 25 − 15 = 10, so one strawberry is 10 ÷ 2 = 5.', v: '<div class="eq">🍓 + 🍓 + 🍎(15) = 25</div><div class="eq">🍓 = 5</div>' }
-          ]
-        },
-        {
-          n: '2',
-          skill: 'Decomposition',
-          t: 'How many squares are there in this picture?',
-          type: 'num',
-          key: [14],
-          render: () => '<div class="hg">' + '<i>🐴</i>'.repeat(9) + '</div><input class="num" type="number" inputmode="numeric" data-p="0" aria-label="Number of squares">',
-          hints: ['Count the small squares first.', 'Now look for bigger squares made of 4 small ones.', 'Don’t forget the biggest square around everything.'],
-          steps: [
-            { t: 'Count the small 1 × 1 squares: there are 9.', v: sq(1) },
-            { t: 'Look for 2 × 2 squares: there are 4.', v: sq(2) },
-            { t: 'There is 1 big 3 × 3 square.', v: sq(3) },
-            { t: 'Add them up: 9 + 4 + 1 = 14 squares.', v: sq(0) + '<div class="eq">9 + 4 + 1 = 14</div>' }
-          ]
-        },
-        mc('3a', 'Find the one that is different from the others.', ['✉️', '☎️', '✈️', '🖥️'], ['Letter', 'Telephone', 'Aeroplane', 'Computer'], 2, 'Letter, telephone and computer are ways to communicate. The aeroplane is for travel, so C is different.'),
-        mc('3b', 'Find the one that is different from the others.', ['🚁', '🚌', '🚆', '📺'], ['Helicopter', 'Bus', 'Train', 'Television'], 3, 'Helicopter, bus and train are used for travel. The television is not, so D is different.'),
-        mc('3c', 'Find the one that is different from the others.', ['🐔', '🐘', '🦌', '🐄'], ['Hen', 'Elephant', 'Deer', 'Cow'], 0, 'Elephant, deer and cow walk on four legs. The hen has two legs, so A is different.'),
-        {
-          n: '4',
-          skill: 'Logical reasoning',
-          t: 'Who is first? Use the clues to find each kid’s place in the ice cream line. Tap a box to mark it.',
-          type: 'grid',
-          key: [2, 1, 0, 4, 3],
-          say: 'Clue 1: Anika is not the last. Clue 2: Alisha is in the exact middle. Clue 3: The person with the shortest name is first. Clue 4: Chirag stands right behind Ellie.',
-          render: () =>
-            '<ol class="cl"><li><b>Anika</b> is not the last to order.</li><li><b>Alisha</b> ends up in exactly the middle of the line.</li><li>The person with the shortest name is first in line.</li><li><b>Chirag</b> is <b>Ellie’s</b> big brother, so he stays right behind her in line.</li></ol><table class="lg"><tr><th>Kids</th>' +
-            [1, 2, 3, 4, 5].map(n => `<th>${n}</th>`).join('') +
-            '</tr>' +
-            N.map((n, r) => `<tr data-p="${r}"><th>${n}</th>` + [0, 1, 2, 3, 4].map(c => `<td tabindex="0" data-r="${r}" data-c="${c}" aria-label="${n} place ${c + 1}"></td>`).join('') + '</tr>').join('') +
-            '</table>',
-          hints: ['Start with the clue that gives an exact place: who is in the middle?', 'Count the letters in each name to find the shortest.', 'Chirag and Ellie need two places side by side.'],
-          steps: [
-            { t: 'Clue 2: Alisha is in the exact middle, so she is 3rd.', v: line({ 3: 'Alisha' }) },
-            { t: 'Clue 3: Zoya has the shortest name (4 letters), so she is 1st.', v: line({ 1: 'Zoya', 3: 'Alisha' }) },
-            { t: 'Clue 4: Chirag is right behind Ellie. Free places are 2, 4 and 5, and only 4 and 5 are side by side. So Ellie is 4th and Chirag is 5th.', v: line({ 1: 'Zoya', 3: 'Alisha', 4: 'Ellie', 5: 'Chirag' }) },
-            { t: 'Clue 1: Anika is not last. Only place 2 is left, so Anika is 2nd.', v: line({ 1: 'Zoya', 2: 'Anika', 3: 'Alisha', 4: 'Ellie', 5: 'Chirag' }) }
-          ]
-        }
-      ];
-
-      /* ---------- Game Engine ---------- */
-      let cur = 0, st = Q.map(() => ({ d: 0, s: 0, t: 0, h: 0, v: 0 }));
-      const tot = () => st.reduce((a, x) => a + x.s, 0), MAX = Q.length * 3;
-      const read = {
-        num: el => [...el.querySelectorAll('input')].map(i => i.value.trim()),
-        mcq: el => { const s = el.querySelector('.opt.sel'); return [s ? +s.dataset.i : -1]; },
-        grid: el => N.map((_, r) => [...el.querySelectorAll(`td[data-r="${r}"]`)].findIndex(t => t.classList.contains('on')))
-      };
-
-      function tabs() {
-        const tabsEl = document.getElementById('tabs');
-        tabsEl.innerHTML = [
-          ...Q.map((q, i) => `<button class="tb${i == cur ? ' on' : ''}${st[i].d ? ' dn' : ''}" data-i="${i}" aria-label="Question ${q.n}">${q.n}</button>`),
-          `<button class="tb${cur == Q.length ? ' on' : ''}" data-i="${Q.length}" aria-label="Results">🏆</button>`
-        ].join('');
-
-        document.getElementById('stars').textContent = '⭐ ' + tot();
-        document.getElementById('pv').style.visibility = cur ? 'visible' : 'hidden';
-        document.getElementById('nx').style.visibility = cur < Q.length ? 'visible' : 'hidden';
-        document.getElementById('nx').textContent = cur == Q.length - 1 ? 'See results ›' : 'Next ›';
-      }
-
-      function say(m) {
-        const sayEl = document.getElementById('say');
-        if (sayEl) sayEl.textContent = m;
-      }
-
-      function show(i) {
-        cur = i;
-        if (window.speechSynthesis) window.speechSynthesis.cancel();
-        const pg = document.getElementById('pg');
-        pg.style.animation = 'none';
-        pg.offsetWidth;
-        pg.style.animation = '';
-        tabs();
-
-        if (i == Q.length) return result(pg);
-
-        const q = Q[i], s = st[i];
-        pg.innerHTML = `
-          <div class="meta">
-            <span class="chip">Question ${q.n}</span>
-            <span class="chip s">${q.skill}</span>
-            <button class="ghost" id="rd">🔊 Read to me</button>
-          </div>
-          <h3>${q.t}</h3>
-          <div id="body">${q.render()}</div>
-          <div class="acts">
-            <button class="btn" id="chk">Check my answer</button>
-            <button class="btn alt" id="hint">💡 Hint</button>
-            <button class="btn alt" id="how">👣 Show me how</button>
-          </div>
-          <div class="bot">
-            <span>🤖</span>
-            <p id="say">${s.d ? 'You earned ' + '⭐'.repeat(s.s) + ' here. Want to see the steps?' : 'Take your time. You can do it!'}</p>
-          </div>
-          <div id="sol"></div>
-        `;
-
-        document.getElementById('rd').onclick = () => {
-          if (!window.speechSynthesis) return;
-          const u = new SpeechSynthesisUtterance(q.t + ' ' + (q.say || ''));
-          u.rate = 0.9;
-          speechSynthesis.speak(u);
-        };
-
-        const bodyEl = document.getElementById('body');
-        bodyEl.onclick = (e) => {
-          const o = e.target.closest('.opt');
-          const c = e.target.closest('td');
-          if (o) {
-            bodyEl.querySelectorAll('.opt').forEach(x => {
-              x.classList.remove('sel', 'ok', 'bad');
-              x.removeAttribute('data-p');
-            });
-            o.classList.add('sel');
-            o.dataset.p = 0;
-            tone(440, 0.08);
-          }
-          if (c) {
-            const on = c.classList.contains('on');
-            c.parentNode.querySelectorAll('td').forEach(x => {
-              x.classList.remove('on');
-              x.textContent = '';
-            });
-            if (!on) {
-              c.classList.add('on');
-              c.textContent = '✔';
-            }
-            tone(440, 0.08);
-          }
-        };
-
-        bodyEl.onkeydown = (e) => {
-          if (e.key == 'Enter' || e.key == ' ') {
-            const c = e.target.closest('td');
-            if (c) {
-              e.preventDefault();
-              c.click();
-            }
-          }
-        };
-
-        document.getElementById('chk').onclick = () => check(q, s);
-        document.getElementById('hint').onclick = () => {
-          const h = q.hints[Math.min(s.h, q.hints.length - 1)];
-          if (!s.d && s.h < q.hints.length) s.h++;
-          say('💡 ' + h);
-        };
-        document.getElementById('how').onclick = () => {
-          if (!s.d) s.v = 1;
-          steps(q, 0);
-        };
-      }
-
-      function check(q, s) {
-        const el = document.getElementById('body');
-        const a = read[q.type](el);
-
-        if (a.every(v => v === '' || v === -1)) {
-          return say(q.type == 'mcq' ? 'Tap a picture first, then check.' : 'Fill in your answer first, then check.');
-        }
-
-        const parts = a.map((v, i) => +v === q.key[i] && v !== '');
-        s.t++;
-
-        el.querySelectorAll('[data-p]').forEach(n => {
-          n.classList.remove('ok', 'bad');
-          n.classList.add(parts[n.dataset.p] ? 'ok' : 'bad');
-        });
-
-        if (parts.every(Boolean)) {
-          if (!s.d) {
-            s.d = 1;
-            s.s = s.v ? 1 : Math.max(1, 3 - (s.t - 1) - s.h);
-          }
-          win();
-          pop();
-          say(['Brilliant! You cracked it! 🎉', 'Yes! Great thinking!', 'Super! That’s correct!'][s.t % 3] + ' ' + '⭐'.repeat(s.s));
-          tabs();
-        } else {
-          oops();
-          const r = parts.filter(Boolean).length;
-          say((q.tip && q.tip(a)) || (parts.length > 1 ? `${r} of ${parts.length} are right. Fix the red ones and try again.` : 'Not quite. Try again, or tap Hint.'));
-        }
-      }
-
-      function steps(q, k) {
-        const sl = document.getElementById('sol');
-        sl.innerHTML = `
-          <div class="sol">
-            <h4>Step-by-step solution</h4>
-            <div class="viz">${q.steps[k].v}</div>
-            <ol>${q.steps.slice(0, k + 1).map((x, j) => `<li class="${j == k ? 'now' : ''}">${x.t}</li>`).join('')}</ol>
-            <div class="acts">
-              ${k ? '<button class="btn alt" id="sb">‹ Previous step</button>' : ''}
-              ${k < q.steps.length - 1 ? '<button class="btn" id="sn">Next step ›</button>' : '<b>🎉 That’s the whole solution!</b>'}
-            </div>
-          </div>
-        `;
-        const b = document.getElementById('sb'), n = document.getElementById('sn');
-        if (b) b.onclick = () => steps(q, k - 1);
-        if (n) n.onclick = () => {
-          tone(520, 0.08);
-          steps(q, k + 1);
-        };
-        sl.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-      }
-
-      function result(pg) {
-        const sk = {};
-        Q.forEach((q, i) => {
-          const o = sk[q.skill] = sk[q.skill] || [0, 0];
-          o[0] += st[i].s;
-          o[1] += 3;
-        });
-        const t = tot(), md = t >= 15 ? 'Gold Thinker 🥇' : t >= 10 ? 'Silver Thinker 🥈' : 'Rising Thinker 🥉';
-
-        pg.innerHTML = `
-          <h3>Chapter 1 complete!</h3>
-          <div class="eq">${md}</div>
-          <p>You collected <b>⭐ ${t} of ${MAX}</b> stars.</p>
-          ${Object.entries(sk).map(([k, v]) => `<div>${k}: ${Math.round(v[0] / v[1] * 100)}%<div class="bar"><i style="width:${v[0] / v[1] * 100}%"></i></div></div>`).join('')}
-          <div class="bot">
-            <span>🤖</span>
-            <p>${t < MAX ? 'Go back to any question to try again and earn more stars.' : 'Perfect score! Chapter 2 is waiting.'}</p>
-          </div>
-          <div class="acts">
-            <button class="btn" id="re">Play again</button>
-          </div>
-        `;
-
-        document.getElementById('re').onclick = () => {
-          st = Q.map(() => ({ d: 0, s: 0, t: 0, h: 0, v: 0 }));
-          show(0);
-        };
-
-        if (t >= 10) {
-          win();
-          pop();
-        }
-      }
-
-      document.getElementById('tabs').onclick = (e) => {
-        const b = e.target.closest('.tb');
-        if (b) show(+b.dataset.i);
-      };
-
-      document.getElementById('pv').onclick = () => show(cur - 1);
-      document.getElementById('nx').onclick = () => show(cur + 1);
-
-      document.getElementById('snd').onclick = (e) => {
-        snd = !snd;
-        e.target.textContent = snd ? '🔊' : '🔇';
-      };
+    /* ============================================================
+       1. CONFIGURATION
+    ============================================================ */
+    const TOTAL_FRAMES  = 359;
+    // Try WebP first (3× smaller), fall back to original JPEG
+    const supportsWebP  = (function () {
+      try {
+        const c = document.createElement('canvas');
+        return c.toDataURL('image/webp').startsWith('data:image/webp');
+      } catch (e) { return false; }
     })();
+    const FRAME_DIR     = supportsWebP ? 'frames_webp' : 'frames';
+    const FRAME_EXT     = supportsWebP ? '.webp' : '.jpg';
+
+    /* ============================================================
+       2. DOM REFS
+    ============================================================ */
+    const canvas         = document.getElementById('anim-canvas');
+    const ctx            = canvas.getContext('2d', { alpha: false });
+    const coverView      = document.getElementById('cover-view');
+    const coverOverlay   = document.getElementById('cover-overlay');
+    const bookSection    = document.getElementById('book-section');
+    const canvasFixed    = document.getElementById('canvas-fixed');
+    const openBookBtn    = document.getElementById('open-book-btn');
+    const rewatchBtn     = document.getElementById('rewatch-btn');
+    const scrollHintBtn  = document.getElementById('scroll-hint-btn');
+    const progressBar    = document.getElementById('scroll-progress-bar');
+    const loadIndicator  = document.getElementById('load-indicator');
+
+    /* ============================================================
+       3. STATE
+    ============================================================ */
+    const images        = new Array(TOTAL_FRAMES);
+    let loadedCount     = 0;
+    let targetProgress  = 0;
+    let currentProgress = 0;
+    let lastDrawnIdx    = -1;
+    let isBookOpen      = false;
+    let rafPending      = false;
+    let dpr             = 1;
+
+    /* ============================================================
+       4. FRAME PATH
+    ============================================================ */
+    function frameSrc(index) {
+      return FRAME_DIR + '/frame_' + String(index + 1).padStart(6, '0') + FRAME_EXT;
+    }
+
+    /* ============================================================
+       5. CANVAS RESIZE
+    ============================================================ */
+    function resize() {
+      dpr = Math.min(window.devicePixelRatio || 1, 2);
+      canvas.width  = Math.round(window.innerWidth  * dpr);
+      canvas.height = Math.round(window.innerHeight * dpr);
+      ctx.imageSmoothingEnabled = true;
+      ctx.imageSmoothingQuality = 'high';
+      lastDrawnIdx = -1; // force redraw after resize
+      scheduleRender();
+    }
+
+    /* ============================================================
+       6. DRAW FRAME (cover-fit)
+    ============================================================ */
+    function drawImage(img) {
+      if (!img || img.naturalWidth === 0) return;
+      const cw = canvas.width, ch = canvas.height;
+      const nw = img.naturalWidth, nh = img.naturalHeight;
+      const imgR = nw / nh, canR = cw / ch;
+      let dw, dh, dx, dy;
+      if (canR > imgR) {
+        dw = cw; dh = cw / imgR; dx = 0; dy = (ch - dh) / 2;
+      } else {
+        dh = ch; dw = ch * imgR; dx = (cw - dw) / 2; dy = 0;
+      }
+      ctx.drawImage(img, dx, dy, dw, dh);
+    }
+
+    function bestLoadedImage(targetIdx) {
+      // Check exact frame first
+      const img = images[targetIdx];
+      if (img && img.complete && img.naturalWidth > 0) return { img, idx: targetIdx };
+      // Spiral outward to find nearest loaded frame
+      for (let off = 1; off < TOTAL_FRAMES; off++) {
+        const p = targetIdx - off;
+        if (p >= 0 && images[p] && images[p].complete && images[p].naturalWidth > 0)
+          return { img: images[p], idx: p };
+        const n = targetIdx + off;
+        if (n < TOTAL_FRAMES && images[n] && images[n].complete && images[n].naturalWidth > 0)
+          return { img: images[n], idx: n };
+      }
+      return null;
+    }
+
+    /* ============================================================
+       7. RENDER (called inside rAF)
+    ============================================================ */
+    function render() {
+      const targetIdx = Math.min(TOTAL_FRAMES - 1, Math.max(0,
+        Math.round(currentProgress * (TOTAL_FRAMES - 1))
+      ));
+      const best = bestLoadedImage(targetIdx);
+      if (!best) return;
+      if (best.idx !== lastDrawnIdx) {
+        drawImage(best.img);
+        lastDrawnIdx = best.idx;
+      }
+    }
+
+    /* ============================================================
+       8. ANIMATION LOOP — smooth lerp with rAF batching
+    ============================================================ */
+    function scheduleRender() {
+      if (!rafPending) {
+        rafPending = true;
+        requestAnimationFrame(loop);
+      }
+    }
+
+    function loop(ts) {
+      rafPending = false;
+      if (!isBookOpen) {
+        const diff = targetProgress - currentProgress;
+        if (Math.abs(diff) > 0.0002) {
+          // Adaptive lerp: faster when far away, smoother near target
+          const speed = Math.abs(diff) > 0.05 ? 0.3 : 0.18;
+          currentProgress += diff * speed;
+          scheduleRender();
+        } else {
+          currentProgress = targetProgress;
+        }
+        render();
+      }
+    }
+
+    /* ============================================================
+       9. SCROLL HANDLER
+    ============================================================ */
+    let scrollRAF = null;
+    function onScroll() {
+      if (isBookOpen) return;
+      if (scrollRAF) return;
+      scrollRAF = requestAnimationFrame(() => {
+        scrollRAF = null;
+        const st = window.scrollY || 0;
+        const maxS = coverView.offsetHeight - window.innerHeight;
+        targetProgress = maxS > 0 ? Math.min(1, Math.max(0, st / maxS)) : 0;
+        progressBar.style.width = (targetProgress * 100).toFixed(2) + '%';
+        scheduleRender();
+      });
+    }
+
+    /* ============================================================
+       10. IMAGE PRELOADING — priority queue strategy
+         1. Frame 1 (immediate first paint)
+         2. Every 15th frame (skeleton for quick jumps)
+         3. All remaining in sequential order
+    ============================================================ */
+    function initImages() {
+      const priorityQueue = [];
+
+      // Priority 1: First frame
+      priorityQueue.push(0);
+      // Priority 2: Keyframes every 15
+      for (let i = 15; i < TOTAL_FRAMES; i += 15) priorityQueue.push(i);
+      // Priority 3: Rest
+      for (let i = 1; i < TOTAL_FRAMES; i++) {
+        if (i % 15 !== 0) priorityQueue.push(i);
+      }
+
+      const CONCURRENCY = 8;
+      let head = 0;
+      let inFlight = 0;
+
+      function loadNext() {
+        while (inFlight < CONCURRENCY && head < priorityQueue.length) {
+          const idx = priorityQueue[head++];
+          if (images[idx] && images[idx].complete && images[idx].naturalWidth > 0) {
+            loadNext();
+            continue;
+          }
+          inFlight++;
+          const img = new Image();
+          img.decoding = 'async';
+          img.src = frameSrc(idx);
+          img.onload = function () {
+            images[idx] = img;
+            loadedCount++;
+            inFlight--;
+            const pct = Math.round(loadedCount / TOTAL_FRAMES * 100);
+            if (pct < 100) {
+              loadIndicator.textContent = 'Loading animation… ' + pct + '%';
+            } else {
+              loadIndicator.classList.add('done');
+            }
+            const curIdx = Math.round(currentProgress * (TOTAL_FRAMES - 1));
+            if (Math.abs(curIdx - idx) <= 3) scheduleRender();
+            loadNext();
+          };
+          img.onerror = function () {
+            inFlight--;
+            loadedCount++;
+            loadNext();
+          };
+          images[idx] = img;
+        }
+      }
+
+      loadNext();
+    }
+
+    /* ============================================================
+       11. OPEN / CLOSE BOOK
+    ============================================================ */
+    function openBook() {
+      isBookOpen = true;
+      coverView.hidden = true;
+      coverOverlay.classList.add('hide');
+      bookSection.hidden = false;
+      canvasFixed.classList.add('blurred');
+      progressBar.style.opacity = '0';
+      window.scrollTo(0, 0);
+      tone(660, 0.15);
+      show(0);
+    }
+
+    function closeBook() {
+      isBookOpen = false;
+      bookSection.hidden = true;
+      coverView.hidden = false;
+      coverOverlay.classList.remove('hide');
+      canvasFixed.classList.remove('blurred');
+      progressBar.style.opacity = '1';
+      window.scrollTo(0, 0);
+      lastDrawnIdx = -1;
+      scheduleRender();
+    }
+
+    openBookBtn.onclick  = openBook;
+    rewatchBtn.onclick   = closeBook;
+    scrollHintBtn.onclick = () => window.scrollBy({ top: window.innerHeight * 0.85, behavior: 'smooth' });
+
+    /* ============================================================
+       12. EVENT LISTENERS
+    ============================================================ */
+    // Debounced resize
+    let resizeTimer;
+    window.addEventListener('resize', () => {
+      clearTimeout(resizeTimer);
+      resizeTimer = setTimeout(resize, 80);
+    }, { passive: true });
+
+    window.addEventListener('scroll',    onScroll, { passive: true });
+    window.addEventListener('touchmove', onScroll, { passive: true });
+
+    /* ============================================================
+       13. BOOTSTRAP
+    ============================================================ */
+    resize();
+    initImages();
+    onScroll();
+    scheduleRender();
+
+    /* ============================================================
+       14. AUDIO (Web Audio API)
+    ============================================================ */
+    let AC = null, snd = 1;
+    function tone(f, d = 0.15, w = 0) {
+      if (!snd) return;
+      try {
+        AC = AC || new (window.AudioContext || window.webkitAudioContext)();
+        const o = AC.createOscillator(), g = AC.createGain(), n = AC.currentTime + w;
+        o.frequency.value = f; o.type = 'triangle';
+        g.gain.setValueAtTime(0.14, n);
+        g.gain.exponentialRampToValueAtTime(0.001, n + d);
+        o.connect(g); g.connect(AC.destination);
+        o.start(n); o.stop(n + d);
+      } catch (e) {}
+    }
+    const win  = () => [523, 659, 784].forEach((f, i) => tone(f, 0.2, i * 0.1));
+    const oops = () => tone(200, 0.3);
+
+    function pop() {
+      for (let i = 0; i < 28; i++) {
+        const s = document.createElement('span');
+        s.className = 'cf';
+        s.textContent = ['⭐','🎉','✨','🎈'][i % 4];
+        s.style.cssText = `left:${Math.random()*100}vw;--dx:${(Math.random()-.5)*220}px;animation-delay:${Math.random()*.3}s`;
+        document.body.append(s);
+        setTimeout(() => s.remove(), 2300);
+      }
+    }
+
+    /* ============================================================
+       15. QUESTION BANK
+    ============================================================ */
+    const N = ['Alisha', 'Anika', 'Zoya', 'Chirag', 'Ellie'];
+
+    const tiles = (em, nm, hl, showName) =>
+      `<div class="ops${hl == null ? '' : ' st'}">` +
+      em.map((e, i) =>
+        `<button class="opt${hl == null ? '' : i === hl ? ' hl' : ' dim'}" data-i="${i}">` +
+        `<span class="em">${e}</span><span class="lt">${'ABCD'[i]}</span>` +
+        (showName ? `<small>${nm[i]}</small>` : '') +
+        `</button>`
+      ).join('') + '</div>';
+
+    const mc = (n, t, em, nm, a, why) => ({
+      n, skill: 'Classification', t, type: 'mcq', key: [a],
+      render: () => tiles(em, nm),
+      hints: ['Say the name of each picture out loud.', 'Three pictures belong to the same group. What do they do?'],
+      steps: [
+        { t: 'Name each picture.', v: tiles(em, nm, -1, 1).replace(/hl|dim/g, '') },
+        { t: why, v: tiles(em, nm, a, 1) }
+      ]
+    });
+
+    const sq = k => {
+      let s = '<svg viewBox="-4 -4 158 158" class="sqv" role="img" aria-label="3 by 3 grid">';
+      for (let i = 0; i < 9; i++)
+        s += `<rect x="${(i%3)*50}" y="${~~(i/3)*50}" width="50" height="50" fill="${k===1?'#3a57e8':'#8899dd'}" fill-opacity="${k===1?.55:.25}" stroke="#56628f"/>`;
+      if (k === 2) [[0,0],[50,0],[0,50],[50,50]].forEach((p,i) =>
+        s += `<rect x="${p[0]+3}" y="${p[1]+3}" width="94" height="94" fill="none" stroke="${['#e8346a','#ffc233','#2fc27a','#9b6bff'][i]}" stroke-width="4"/>`);
+      if (k === 3) s += '<rect x="2" y="2" width="146" height="146" fill="none" stroke="#ff8a3d" stroke-width="5"/>';
+      return s + '</svg>';
+    };
+
+    const line = m =>
+      `<div class="ln">${[1,2,3,4,5].map(n =>
+        `<div class="sl${m[n]?' f':''}"><small>${n}</small>${m[n]?'🧒<b>'+m[n]+'</b>':'?'}</div>`
+      ).join('')}</div>`;
+
+    const Q = [
+      {
+        n:'1', skill:'Logical reasoning',
+        t:'Use the clues to find the number each fruit represents.',
+        type:'num', key:[10,15,5],
+        render: () => [['🥭🥭',20,'🥭'],['🍎🥭',25,'🍎'],['🍓🍓🍎',25,'🍓']].map((r,i) =>
+          `<div class="scale"><span>${r[0]}</span><span class="bal">⚖️</span><b>${r[1]}</b>` +
+          `<label>${r[2]} = <input class="num" type="number" inputmode="numeric" data-p="${i}" aria-label="Value of ${r[2]}"></label></div>`
+        ).join(''),
+        tip: v => v[0]==='20' ? 'Two mangoes together make 20. Share that between them!' : '',
+        hints: [
+          'Start with the scale that has only one kind of fruit.',
+          'Once you know the mango, use it in the second scale.',
+          'Two strawberries and an apple make 25. You already know the apple!'
+        ],
+        steps: [
+          { t:'Two mangoes balance 20, so one mango is 20 ÷ 2 = 10.', v:'<div class="eq">🥭 + 🥭 = 20</div><div class="eq">🥭 = 10</div>' },
+          { t:'An apple and a mango balance 25. The mango is 10, so the apple is 25 − 10 = 15.', v:'<div class="eq">🍎 + 🥭(10) = 25</div><div class="eq">🍎 = 15</div>' },
+          { t:'Two strawberries and an apple balance 25. Two strawberries = 25 − 15 = 10, so one strawberry is 10 ÷ 2 = 5.', v:'<div class="eq">🍓 + 🍓 + 🍎(15) = 25</div><div class="eq">🍓 = 5</div>' }
+        ]
+      },
+      {
+        n:'2', skill:'Decomposition',
+        t:'How many squares are there in this picture?',
+        type:'num', key:[14],
+        render: () => '<div class="hg">' + '<i>🐴</i>'.repeat(9) + '</div>' +
+          '<input class="num" type="number" inputmode="numeric" data-p="0" aria-label="Number of squares">',
+        hints: ['Count the small squares first.','Now look for bigger squares made of 4 small ones.','Don\'t forget the biggest square around everything.'],
+        steps: [
+          { t:'Count the small 1×1 squares: there are 9.',    v: sq(1) },
+          { t:'Look for 2×2 squares: there are 4.',           v: sq(2) },
+          { t:'There is 1 big 3×3 square.',                   v: sq(3) },
+          { t:'Add them up: 9 + 4 + 1 = 14 squares.',        v: sq(0)+'<div class="eq">9 + 4 + 1 = 14</div>' }
+        ]
+      },
+      mc('3a','Find the one that is different from the others.',['✉️','☎️','✈️','🖥️'],['Letter','Telephone','Aeroplane','Computer'],2,'Letter, telephone and computer are ways to communicate. The aeroplane is for travel, so C is different.'),
+      mc('3b','Find the one that is different from the others.',['🚁','🚌','🚆','📺'],['Helicopter','Bus','Train','Television'],3,'Helicopter, bus and train are used for travel. The television is not, so D is different.'),
+      mc('3c','Find the one that is different from the others.',['🐔','🐘','🦌','🐄'],['Hen','Elephant','Deer','Cow'],0,'Elephant, deer and cow walk on four legs. The hen has two legs, so A is different.'),
+      {
+        n:'4', skill:'Logical reasoning',
+        t:'Who is first? Use the clues to find each kid\'s place in the ice cream line. Tap a box to mark it.',
+        type:'grid', key:[2,1,0,4,3],
+        say:'Clue 1: Anika is not the last. Clue 2: Alisha is in the exact middle. Clue 3: The person with the shortest name is first. Clue 4: Chirag stands right behind Ellie.',
+        render: () =>
+          '<ol class="cl">' +
+          '<li><b>Anika</b> is not the last to order.</li>' +
+          '<li><b>Alisha</b> ends up in exactly the middle of the line.</li>' +
+          '<li>The person with the shortest name is first in line.</li>' +
+          '<li><b>Chirag</b> is <b>Ellie\'s</b> big brother, so he stays right behind her.</li>' +
+          '</ol>' +
+          '<div class="lg-wrapper"><table class="lg"><tr><th>Kids</th>' +
+          [1,2,3,4,5].map(n=>`<th>${n}</th>`).join('') + '</tr>' +
+          N.map((n,r) =>
+            `<tr data-p="${r}"><th>${n}</th>` +
+            [0,1,2,3,4].map(c=>`<td tabindex="0" data-r="${r}" data-c="${c}" aria-label="${n} place ${c+1}"></td>`).join('') +
+            '</tr>'
+          ).join('') + '</table></div>',
+        hints: [
+          'Start with the clue that gives an exact place: who is in the middle?',
+          'Count the letters in each name to find the shortest.',
+          'Chirag and Ellie need two places side by side.'
+        ],
+        steps: [
+          { t:'Clue 2: Alisha is in the exact middle, so she is 3rd.',           v: line({3:'Alisha'}) },
+          { t:'Clue 3: Zoya has the shortest name (4 letters), so she is 1st.',   v: line({1:'Zoya',3:'Alisha'}) },
+          { t:'Clue 4: Chirag is right behind Ellie. Ellie is 4th, Chirag is 5th.', v: line({1:'Zoya',3:'Alisha',4:'Ellie',5:'Chirag'}) },
+          { t:'Clue 1: Anika is not last. Only place 2 is left.',                 v: line({1:'Zoya',2:'Anika',3:'Alisha',4:'Ellie',5:'Chirag'}) }
+        ]
+      }
+    ];
+
+    /* ============================================================
+       16. GAME ENGINE
+    ============================================================ */
+    let cur = 0;
+    let st  = Q.map(() => ({ d:0, s:0, t:0, h:0, v:0 }));
+    const tot = () => st.reduce((a, x) => a + x.s, 0);
+    const MAX = Q.length * 3;
+
+    const readVal = {
+      num:  el => [...el.querySelectorAll('input')].map(i => i.value.trim()),
+      mcq:  el => { const s = el.querySelector('.opt.sel'); return [s ? +s.dataset.i : -1]; },
+      grid: el => N.map((_,r) =>
+        [...el.querySelectorAll(`td[data-r="${r}"]`)].findIndex(t => t.classList.contains('on'))
+      )
+    };
+
+    function tabs() {
+      document.getElementById('tabs').innerHTML = [
+        ...Q.map((q, i) =>
+          `<button class="tb${i===cur?' on':''}${st[i].d?' dn':''}" data-i="${i}" aria-label="Question ${q.n}">${q.n}</button>`
+        ),
+        `<button class="tb${cur===Q.length?' on':''}" data-i="${Q.length}" aria-label="Results">🏆</button>`
+      ].join('');
+      document.getElementById('stars').textContent = '⭐ ' + tot();
+      document.getElementById('pv').style.visibility = cur > 0 ? 'visible' : 'hidden';
+      document.getElementById('nx').style.visibility = cur < Q.length ? 'visible' : 'hidden';
+      document.getElementById('nx').textContent = cur === Q.length - 1 ? 'See results ›' : 'Next ›';
+    }
+
+    function say(m) {
+      const el = document.getElementById('say');
+      if (el) el.textContent = m;
+    }
+
+    function show(i) {
+      cur = i;
+      if (window.speechSynthesis) window.speechSynthesis.cancel();
+      const pg = document.getElementById('pg');
+      pg.style.animation = 'none';
+      pg.offsetWidth; // force reflow for animation restart
+      pg.style.animation = '';
+      tabs();
+
+      if (i === Q.length) return result(pg);
+
+      const q = Q[i], s = st[i];
+      pg.innerHTML =
+        `<div class="meta"><span class="chip">Question ${q.n}</span><span class="chip s">${q.skill}</span>` +
+        `<button class="ghost" id="rd">🔊 Read to me</button></div>` +
+        `<h3>${q.t}</h3><div id="body">${q.render()}</div>` +
+        `<div class="acts">` +
+        `<button class="btn" id="chk">Check my answer ✓</button>` +
+        `<button class="btn alt" id="hint">💡 Hint</button>` +
+        `<button class="btn alt" id="how">👣 Show me how</button></div>` +
+        `<div class="bot"><span>🤖</span><p id="say">${
+          s.d ? 'You earned ' + '⭐'.repeat(s.s) + ' here. Want to see the steps?' : 'Take your time. You can do it!'
+        }</p></div><div id="sol"></div>`;
+
+      document.getElementById('rd').onclick = () => {
+        if (!window.speechSynthesis) return;
+        const u = new SpeechSynthesisUtterance(q.t + ' ' + (q.say || ''));
+        u.rate = 0.9;
+        speechSynthesis.speak(u);
+      };
+
+      const bodyEl = document.getElementById('body');
+      bodyEl.onclick = e => {
+        const o = e.target.closest('.opt'), c = e.target.closest('td');
+        if (o) {
+          bodyEl.querySelectorAll('.opt').forEach(x => { x.classList.remove('sel','ok','bad'); x.removeAttribute('data-p'); });
+          o.classList.add('sel'); o.dataset.p = 0; tone(440, 0.08);
+        }
+        if (c) {
+          const on = c.classList.contains('on');
+          c.parentNode.querySelectorAll('td').forEach(x => { x.classList.remove('on'); x.textContent = ''; });
+          if (!on) { c.classList.add('on'); c.textContent = '✔'; }
+          tone(440, 0.08);
+        }
+      };
+
+      bodyEl.onkeydown = e => {
+        if ((e.key === 'Enter' || e.key === ' ') && e.target.closest('td')) {
+          e.preventDefault(); e.target.closest('td').click();
+        }
+      };
+
+      document.getElementById('chk').onclick = () => check(q, s);
+      document.getElementById('hint').onclick = () => {
+        const h = q.hints[Math.min(s.h, q.hints.length - 1)];
+        if (!s.d && s.h < q.hints.length) s.h++;
+        say('💡 ' + h);
+      };
+      document.getElementById('how').onclick = () => { if (!s.d) s.v = 1; steps(q, 0); };
+
+      // Scroll top of book into view on mobile
+      document.getElementById('book').scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+
+    function check(q, s) {
+      const el = document.getElementById('body');
+      const a  = readVal[q.type](el);
+      if (a.every(v => v === '' || v === -1))
+        return say(q.type === 'mcq' ? 'Tap a picture first, then check.' : 'Fill in your answer first, then check.');
+      const parts = a.map((v, i) => +v === q.key[i] && v !== '');
+      s.t++;
+      el.querySelectorAll('[data-p]').forEach(n => {
+        n.classList.remove('ok','bad');
+        n.classList.add(parts[+n.dataset.p] ? 'ok' : 'bad');
+      });
+      if (parts.every(Boolean)) {
+        if (!s.d) { s.d = 1; s.s = s.v ? 1 : Math.max(1, 3 - (s.t - 1) - s.h); }
+        win(); pop();
+        say(['Brilliant! You cracked it! 🎉','Yes! Great thinking!','Super! That\'s correct!'][s.t % 3] + ' ' + '⭐'.repeat(s.s));
+        tabs();
+      } else {
+        oops();
+        const r = parts.filter(Boolean).length;
+        say((q.tip && q.tip(a)) || (parts.length > 1 ? `${r} of ${parts.length} are right. Fix the red ones and try again.` : 'Not quite. Try again, or tap Hint.'));
+      }
+    }
+
+    function steps(q, k) {
+      const sl = document.getElementById('sol');
+      sl.innerHTML =
+        `<div class="sol"><h4>Step-by-step solution</h4>` +
+        `<div class="viz">${q.steps[k].v}</div>` +
+        `<ol>${q.steps.slice(0, k+1).map((x,j) => `<li class="${j===k?'now':''}">${x.t}</li>`).join('')}</ol>` +
+        `<div class="acts">` +
+        (k ? `<button class="btn alt" id="sb">‹ Previous step</button>` : '') +
+        (k < q.steps.length-1 ? `<button class="btn" id="sn">Next step ›</button>` : `<b>🎉 That's the whole solution!</b>`) +
+        `</div></div>`;
+      const sb = document.getElementById('sb'), sn = document.getElementById('sn');
+      if (sb) sb.onclick = () => steps(q, k-1);
+      if (sn) sn.onclick = () => { tone(520, 0.08); steps(q, k+1); };
+      sl.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }
+
+    function result(pg) {
+      const sk = {};
+      Q.forEach((q, i) => { const o = sk[q.skill] = sk[q.skill]||[0,0]; o[0]+=st[i].s; o[1]+=3; });
+      const t  = tot();
+      const md = t>=15 ? 'Gold Thinker 🥇' : t>=10 ? 'Silver Thinker 🥈' : 'Rising Thinker 🥉';
+      pg.innerHTML =
+        `<h3>Chapter 1 complete!</h3><div class="eq">${md}</div>` +
+        `<p>You collected <b>⭐ ${t} of ${MAX}</b> stars.</p>` +
+        Object.entries(sk).map(([k,v]) =>
+          `<div>${k}: ${Math.round(v[0]/v[1]*100)}%<div class="bar"><i style="width:${v[0]/v[1]*100}%"></i></div></div>`
+        ).join('') +
+        `<div class="bot"><span>🤖</span><p>${t<MAX?'Go back to any question to try again and earn more stars.':'Perfect score! Chapter 2 is waiting.'}</p></div>` +
+        `<div class="acts"><button class="btn" id="re">Play again 🔄</button></div>`;
+      document.getElementById('re').onclick = () => { st = Q.map(()=>({d:0,s:0,t:0,h:0,v:0})); show(0); };
+      if (t >= 10) { win(); pop(); }
+    }
+
+    // Tab nav
+    document.getElementById('tabs').onclick = e => {
+      const b = e.target.closest('.tb');
+      if (b) show(+b.dataset.i);
+    };
+    document.getElementById('pv').onclick = () => show(cur - 1);
+    document.getElementById('nx').onclick = () => show(cur + 1);
+    document.getElementById('snd').onclick = e => {
+      snd = !snd;
+      e.target.textContent = snd ? '🔊' : '🔇';
+    };
+
+  })();
   </script>
 </body>
 </html>
