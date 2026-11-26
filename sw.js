@@ -1,425 +1,64 @@
 // Future Tech Minds 3 - Service Worker
-// Auto-generated - handles offline caching
+// Fast-install SW: caches core shell immediately, caches frames on fetch
 
-const CACHE_NAME = 'ftm3-v1';
+const CACHE_NAME = 'ftm3-v2';
 
-// Core files always cached
 const CORE_FILES = [
   '/',
   '/index.html',
 ];
 
-// All animation frames (WebP)
-const FRAME_FILES = [
-  "/frames_webp/frame_000001.webp",
-  "/frames_webp/frame_000002.webp",
-  "/frames_webp/frame_000003.webp",
-  "/frames_webp/frame_000004.webp",
-  "/frames_webp/frame_000005.webp",
-  "/frames_webp/frame_000006.webp",
-  "/frames_webp/frame_000007.webp",
-  "/frames_webp/frame_000008.webp",
-  "/frames_webp/frame_000009.webp",
-  "/frames_webp/frame_000010.webp",
-  "/frames_webp/frame_000011.webp",
-  "/frames_webp/frame_000012.webp",
-  "/frames_webp/frame_000013.webp",
-  "/frames_webp/frame_000014.webp",
-  "/frames_webp/frame_000015.webp",
-  "/frames_webp/frame_000016.webp",
-  "/frames_webp/frame_000017.webp",
-  "/frames_webp/frame_000018.webp",
-  "/frames_webp/frame_000019.webp",
-  "/frames_webp/frame_000020.webp",
-  "/frames_webp/frame_000021.webp",
-  "/frames_webp/frame_000022.webp",
-  "/frames_webp/frame_000023.webp",
-  "/frames_webp/frame_000024.webp",
-  "/frames_webp/frame_000025.webp",
-  "/frames_webp/frame_000026.webp",
-  "/frames_webp/frame_000027.webp",
-  "/frames_webp/frame_000028.webp",
-  "/frames_webp/frame_000029.webp",
-  "/frames_webp/frame_000030.webp",
-  "/frames_webp/frame_000031.webp",
-  "/frames_webp/frame_000032.webp",
-  "/frames_webp/frame_000033.webp",
-  "/frames_webp/frame_000034.webp",
-  "/frames_webp/frame_000035.webp",
-  "/frames_webp/frame_000036.webp",
-  "/frames_webp/frame_000037.webp",
-  "/frames_webp/frame_000038.webp",
-  "/frames_webp/frame_000039.webp",
-  "/frames_webp/frame_000040.webp",
-  "/frames_webp/frame_000041.webp",
-  "/frames_webp/frame_000042.webp",
-  "/frames_webp/frame_000043.webp",
-  "/frames_webp/frame_000044.webp",
-  "/frames_webp/frame_000045.webp",
-  "/frames_webp/frame_000046.webp",
-  "/frames_webp/frame_000047.webp",
-  "/frames_webp/frame_000048.webp",
-  "/frames_webp/frame_000049.webp",
-  "/frames_webp/frame_000050.webp",
-  "/frames_webp/frame_000051.webp",
-  "/frames_webp/frame_000052.webp",
-  "/frames_webp/frame_000053.webp",
-  "/frames_webp/frame_000054.webp",
-  "/frames_webp/frame_000055.webp",
-  "/frames_webp/frame_000056.webp",
-  "/frames_webp/frame_000057.webp",
-  "/frames_webp/frame_000058.webp",
-  "/frames_webp/frame_000059.webp",
-  "/frames_webp/frame_000060.webp",
-  "/frames_webp/frame_000061.webp",
-  "/frames_webp/frame_000062.webp",
-  "/frames_webp/frame_000063.webp",
-  "/frames_webp/frame_000064.webp",
-  "/frames_webp/frame_000065.webp",
-  "/frames_webp/frame_000066.webp",
-  "/frames_webp/frame_000067.webp",
-  "/frames_webp/frame_000068.webp",
-  "/frames_webp/frame_000069.webp",
-  "/frames_webp/frame_000070.webp",
-  "/frames_webp/frame_000071.webp",
-  "/frames_webp/frame_000072.webp",
-  "/frames_webp/frame_000073.webp",
-  "/frames_webp/frame_000074.webp",
-  "/frames_webp/frame_000075.webp",
-  "/frames_webp/frame_000076.webp",
-  "/frames_webp/frame_000077.webp",
-  "/frames_webp/frame_000078.webp",
-  "/frames_webp/frame_000079.webp",
-  "/frames_webp/frame_000080.webp",
-  "/frames_webp/frame_000081.webp",
-  "/frames_webp/frame_000082.webp",
-  "/frames_webp/frame_000083.webp",
-  "/frames_webp/frame_000084.webp",
-  "/frames_webp/frame_000085.webp",
-  "/frames_webp/frame_000086.webp",
-  "/frames_webp/frame_000087.webp",
-  "/frames_webp/frame_000088.webp",
-  "/frames_webp/frame_000089.webp",
-  "/frames_webp/frame_000090.webp",
-  "/frames_webp/frame_000091.webp",
-  "/frames_webp/frame_000092.webp",
-  "/frames_webp/frame_000093.webp",
-  "/frames_webp/frame_000094.webp",
-  "/frames_webp/frame_000095.webp",
-  "/frames_webp/frame_000096.webp",
-  "/frames_webp/frame_000097.webp",
-  "/frames_webp/frame_000098.webp",
-  "/frames_webp/frame_000099.webp",
-  "/frames_webp/frame_000100.webp",
-  "/frames_webp/frame_000101.webp",
-  "/frames_webp/frame_000102.webp",
-  "/frames_webp/frame_000103.webp",
-  "/frames_webp/frame_000104.webp",
-  "/frames_webp/frame_000105.webp",
-  "/frames_webp/frame_000106.webp",
-  "/frames_webp/frame_000107.webp",
-  "/frames_webp/frame_000108.webp",
-  "/frames_webp/frame_000109.webp",
-  "/frames_webp/frame_000110.webp",
-  "/frames_webp/frame_000111.webp",
-  "/frames_webp/frame_000112.webp",
-  "/frames_webp/frame_000113.webp",
-  "/frames_webp/frame_000114.webp",
-  "/frames_webp/frame_000115.webp",
-  "/frames_webp/frame_000116.webp",
-  "/frames_webp/frame_000117.webp",
-  "/frames_webp/frame_000118.webp",
-  "/frames_webp/frame_000119.webp",
-  "/frames_webp/frame_000120.webp",
-  "/frames_webp/frame_000121.webp",
-  "/frames_webp/frame_000122.webp",
-  "/frames_webp/frame_000123.webp",
-  "/frames_webp/frame_000124.webp",
-  "/frames_webp/frame_000125.webp",
-  "/frames_webp/frame_000126.webp",
-  "/frames_webp/frame_000127.webp",
-  "/frames_webp/frame_000128.webp",
-  "/frames_webp/frame_000129.webp",
-  "/frames_webp/frame_000130.webp",
-  "/frames_webp/frame_000131.webp",
-  "/frames_webp/frame_000132.webp",
-  "/frames_webp/frame_000133.webp",
-  "/frames_webp/frame_000134.webp",
-  "/frames_webp/frame_000135.webp",
-  "/frames_webp/frame_000136.webp",
-  "/frames_webp/frame_000137.webp",
-  "/frames_webp/frame_000138.webp",
-  "/frames_webp/frame_000139.webp",
-  "/frames_webp/frame_000140.webp",
-  "/frames_webp/frame_000141.webp",
-  "/frames_webp/frame_000142.webp",
-  "/frames_webp/frame_000143.webp",
-  "/frames_webp/frame_000144.webp",
-  "/frames_webp/frame_000145.webp",
-  "/frames_webp/frame_000146.webp",
-  "/frames_webp/frame_000147.webp",
-  "/frames_webp/frame_000148.webp",
-  "/frames_webp/frame_000149.webp",
-  "/frames_webp/frame_000150.webp",
-  "/frames_webp/frame_000151.webp",
-  "/frames_webp/frame_000152.webp",
-  "/frames_webp/frame_000153.webp",
-  "/frames_webp/frame_000154.webp",
-  "/frames_webp/frame_000155.webp",
-  "/frames_webp/frame_000156.webp",
-  "/frames_webp/frame_000157.webp",
-  "/frames_webp/frame_000158.webp",
-  "/frames_webp/frame_000159.webp",
-  "/frames_webp/frame_000160.webp",
-  "/frames_webp/frame_000161.webp",
-  "/frames_webp/frame_000162.webp",
-  "/frames_webp/frame_000163.webp",
-  "/frames_webp/frame_000164.webp",
-  "/frames_webp/frame_000165.webp",
-  "/frames_webp/frame_000166.webp",
-  "/frames_webp/frame_000167.webp",
-  "/frames_webp/frame_000168.webp",
-  "/frames_webp/frame_000169.webp",
-  "/frames_webp/frame_000170.webp",
-  "/frames_webp/frame_000171.webp",
-  "/frames_webp/frame_000172.webp",
-  "/frames_webp/frame_000173.webp",
-  "/frames_webp/frame_000174.webp",
-  "/frames_webp/frame_000175.webp",
-  "/frames_webp/frame_000176.webp",
-  "/frames_webp/frame_000177.webp",
-  "/frames_webp/frame_000178.webp",
-  "/frames_webp/frame_000179.webp",
-  "/frames_webp/frame_000180.webp",
-  "/frames_webp/frame_000181.webp",
-  "/frames_webp/frame_000182.webp",
-  "/frames_webp/frame_000183.webp",
-  "/frames_webp/frame_000184.webp",
-  "/frames_webp/frame_000185.webp",
-  "/frames_webp/frame_000186.webp",
-  "/frames_webp/frame_000187.webp",
-  "/frames_webp/frame_000188.webp",
-  "/frames_webp/frame_000189.webp",
-  "/frames_webp/frame_000190.webp",
-  "/frames_webp/frame_000191.webp",
-  "/frames_webp/frame_000192.webp",
-  "/frames_webp/frame_000193.webp",
-  "/frames_webp/frame_000194.webp",
-  "/frames_webp/frame_000195.webp",
-  "/frames_webp/frame_000196.webp",
-  "/frames_webp/frame_000197.webp",
-  "/frames_webp/frame_000198.webp",
-  "/frames_webp/frame_000199.webp",
-  "/frames_webp/frame_000200.webp",
-  "/frames_webp/frame_000201.webp",
-  "/frames_webp/frame_000202.webp",
-  "/frames_webp/frame_000203.webp",
-  "/frames_webp/frame_000204.webp",
-  "/frames_webp/frame_000205.webp",
-  "/frames_webp/frame_000206.webp",
-  "/frames_webp/frame_000207.webp",
-  "/frames_webp/frame_000208.webp",
-  "/frames_webp/frame_000209.webp",
-  "/frames_webp/frame_000210.webp",
-  "/frames_webp/frame_000211.webp",
-  "/frames_webp/frame_000212.webp",
-  "/frames_webp/frame_000213.webp",
-  "/frames_webp/frame_000214.webp",
-  "/frames_webp/frame_000215.webp",
-  "/frames_webp/frame_000216.webp",
-  "/frames_webp/frame_000217.webp",
-  "/frames_webp/frame_000218.webp",
-  "/frames_webp/frame_000219.webp",
-  "/frames_webp/frame_000220.webp",
-  "/frames_webp/frame_000221.webp",
-  "/frames_webp/frame_000222.webp",
-  "/frames_webp/frame_000223.webp",
-  "/frames_webp/frame_000224.webp",
-  "/frames_webp/frame_000225.webp",
-  "/frames_webp/frame_000226.webp",
-  "/frames_webp/frame_000227.webp",
-  "/frames_webp/frame_000228.webp",
-  "/frames_webp/frame_000229.webp",
-  "/frames_webp/frame_000230.webp",
-  "/frames_webp/frame_000231.webp",
-  "/frames_webp/frame_000232.webp",
-  "/frames_webp/frame_000233.webp",
-  "/frames_webp/frame_000234.webp",
-  "/frames_webp/frame_000235.webp",
-  "/frames_webp/frame_000236.webp",
-  "/frames_webp/frame_000237.webp",
-  "/frames_webp/frame_000238.webp",
-  "/frames_webp/frame_000239.webp",
-  "/frames_webp/frame_000240.webp",
-  "/frames_webp/frame_000241.webp",
-  "/frames_webp/frame_000242.webp",
-  "/frames_webp/frame_000243.webp",
-  "/frames_webp/frame_000244.webp",
-  "/frames_webp/frame_000245.webp",
-  "/frames_webp/frame_000246.webp",
-  "/frames_webp/frame_000247.webp",
-  "/frames_webp/frame_000248.webp",
-  "/frames_webp/frame_000249.webp",
-  "/frames_webp/frame_000250.webp",
-  "/frames_webp/frame_000251.webp",
-  "/frames_webp/frame_000252.webp",
-  "/frames_webp/frame_000253.webp",
-  "/frames_webp/frame_000254.webp",
-  "/frames_webp/frame_000255.webp",
-  "/frames_webp/frame_000256.webp",
-  "/frames_webp/frame_000257.webp",
-  "/frames_webp/frame_000258.webp",
-  "/frames_webp/frame_000259.webp",
-  "/frames_webp/frame_000260.webp",
-  "/frames_webp/frame_000261.webp",
-  "/frames_webp/frame_000262.webp",
-  "/frames_webp/frame_000263.webp",
-  "/frames_webp/frame_000264.webp",
-  "/frames_webp/frame_000265.webp",
-  "/frames_webp/frame_000266.webp",
-  "/frames_webp/frame_000267.webp",
-  "/frames_webp/frame_000268.webp",
-  "/frames_webp/frame_000269.webp",
-  "/frames_webp/frame_000270.webp",
-  "/frames_webp/frame_000271.webp",
-  "/frames_webp/frame_000272.webp",
-  "/frames_webp/frame_000273.webp",
-  "/frames_webp/frame_000274.webp",
-  "/frames_webp/frame_000275.webp",
-  "/frames_webp/frame_000276.webp",
-  "/frames_webp/frame_000277.webp",
-  "/frames_webp/frame_000278.webp",
-  "/frames_webp/frame_000279.webp",
-  "/frames_webp/frame_000280.webp",
-  "/frames_webp/frame_000281.webp",
-  "/frames_webp/frame_000282.webp",
-  "/frames_webp/frame_000283.webp",
-  "/frames_webp/frame_000284.webp",
-  "/frames_webp/frame_000285.webp",
-  "/frames_webp/frame_000286.webp",
-  "/frames_webp/frame_000287.webp",
-  "/frames_webp/frame_000288.webp",
-  "/frames_webp/frame_000289.webp",
-  "/frames_webp/frame_000290.webp",
-  "/frames_webp/frame_000291.webp",
-  "/frames_webp/frame_000292.webp",
-  "/frames_webp/frame_000293.webp",
-  "/frames_webp/frame_000294.webp",
-  "/frames_webp/frame_000295.webp",
-  "/frames_webp/frame_000296.webp",
-  "/frames_webp/frame_000297.webp",
-  "/frames_webp/frame_000298.webp",
-  "/frames_webp/frame_000299.webp",
-  "/frames_webp/frame_000300.webp",
-  "/frames_webp/frame_000301.webp",
-  "/frames_webp/frame_000302.webp",
-  "/frames_webp/frame_000303.webp",
-  "/frames_webp/frame_000304.webp",
-  "/frames_webp/frame_000305.webp",
-  "/frames_webp/frame_000306.webp",
-  "/frames_webp/frame_000307.webp",
-  "/frames_webp/frame_000308.webp",
-  "/frames_webp/frame_000309.webp",
-  "/frames_webp/frame_000310.webp",
-  "/frames_webp/frame_000311.webp",
-  "/frames_webp/frame_000312.webp",
-  "/frames_webp/frame_000313.webp",
-  "/frames_webp/frame_000314.webp",
-  "/frames_webp/frame_000315.webp",
-  "/frames_webp/frame_000316.webp",
-  "/frames_webp/frame_000317.webp",
-  "/frames_webp/frame_000318.webp",
-  "/frames_webp/frame_000319.webp",
-  "/frames_webp/frame_000320.webp",
-  "/frames_webp/frame_000321.webp",
-  "/frames_webp/frame_000322.webp",
-  "/frames_webp/frame_000323.webp",
-  "/frames_webp/frame_000324.webp",
-  "/frames_webp/frame_000325.webp",
-  "/frames_webp/frame_000326.webp",
-  "/frames_webp/frame_000327.webp",
-  "/frames_webp/frame_000328.webp",
-  "/frames_webp/frame_000329.webp",
-  "/frames_webp/frame_000330.webp",
-  "/frames_webp/frame_000331.webp",
-  "/frames_webp/frame_000332.webp",
-  "/frames_webp/frame_000333.webp",
-  "/frames_webp/frame_000334.webp",
-  "/frames_webp/frame_000335.webp",
-  "/frames_webp/frame_000336.webp",
-  "/frames_webp/frame_000337.webp",
-  "/frames_webp/frame_000338.webp",
-  "/frames_webp/frame_000339.webp",
-  "/frames_webp/frame_000340.webp",
-  "/frames_webp/frame_000341.webp",
-  "/frames_webp/frame_000342.webp",
-  "/frames_webp/frame_000343.webp",
-  "/frames_webp/frame_000344.webp",
-  "/frames_webp/frame_000345.webp",
-  "/frames_webp/frame_000346.webp",
-  "/frames_webp/frame_000347.webp",
-  "/frames_webp/frame_000348.webp",
-  "/frames_webp/frame_000349.webp",
-  "/frames_webp/frame_000350.webp",
-  "/frames_webp/frame_000351.webp",
-  "/frames_webp/frame_000352.webp",
-  "/frames_webp/frame_000353.webp",
-  "/frames_webp/frame_000354.webp",
-  "/frames_webp/frame_000355.webp",
-  "/frames_webp/frame_000356.webp",
-  "/frames_webp/frame_000357.webp",
-  "/frames_webp/frame_000358.webp",
-  "/frames_webp/frame_000359.webp"
-];
-
-const ALL_FILES = [...CORE_FILES, ...FRAME_FILES];
-
-// INSTALL: cache everything
+// INSTALL: cache core HTML shell immediately so SW activates in <1s
 self.addEventListener('install', event => {
   self.skipWaiting();
   event.waitUntil(
-    caches.open(CACHE_NAME).then(async cache => {
-      // Cache core files immediately
-      await cache.addAll(CORE_FILES);
-      // Cache frames in small batches (avoid memory spike)
-      const BATCH = 20;
-      for (let i = 0; i < FRAME_FILES.length; i += BATCH) {
-        const batch = FRAME_FILES.slice(i, i + BATCH);
-        await cache.addAll(batch).catch(() => {}); // ignore individual failures
-      }
-    })
+    caches.open(CACHE_NAME).then(cache => cache.addAll(CORE_FILES))
   );
 });
 
-// ACTIVATE: clean up old caches
+// ACTIVATE: clean up old caches and take control immediately
 self.addEventListener('activate', event => {
   event.waitUntil(
-    caches.keys().then(keys =>
-      Promise.all(keys.filter(k => k !== CACHE_NAME).map(k => caches.delete(k)))
-    ).then(() => self.clients.claim())
+    caches.keys()
+      .then(keys => Promise.all(keys.filter(k => k !== CACHE_NAME).map(k => caches.delete(k))))
+      .then(() => self.clients.claim())
   );
 });
 
-// FETCH: serve from cache, fall back to network
+// FETCH: cache-first for static assets & frames, with offline navigation fallback
 self.addEventListener('fetch', event => {
-  // Only handle same-origin GET requests
   if (event.request.method !== 'GET') return;
 
+  const url = new URL(event.request.url);
+  if (url.origin !== self.location.origin) return;
+
+  // Navigation requests (opening or refreshing the page)
+  if (event.request.mode === 'navigate') {
+    event.respondWith(
+      caches.match('/index.html', { ignoreSearch: true }).then(cached => {
+        if (cached) return cached;
+        return fetch(event.request).then(res => {
+          if (res && res.status === 200) {
+            const clone = res.clone();
+            caches.open(CACHE_NAME).then(c => c.put('/index.html', clone));
+          }
+          return res;
+        });
+      }).catch(() => caches.match('/index.html'))
+    );
+    return;
+  }
+
+  // Frames and other same-origin assets: cache-first, populate cache on first fetch
   event.respondWith(
-    caches.match(event.request).then(cached => {
+    caches.match(event.request, { ignoreSearch: true }).then(cached => {
       if (cached) return cached;
-      // Not in cache - fetch from network and cache it
       return fetch(event.request).then(response => {
         if (response && response.status === 200) {
           const clone = response.clone();
           caches.open(CACHE_NAME).then(cache => cache.put(event.request, clone));
         }
         return response;
-      }).catch(() => {
-        // Network failed + not in cache - return fallback for HTML
-        if (event.request.destination === 'document') {
-          return caches.match('/index.html');
-        }
       });
     })
   );
