@@ -1611,7 +1611,7 @@
         { id: 3, ready: true,  desc: '1 Chapter • 6 Puzzles' },
         { id: 4, ready: false, desc: 'Curriculum coming soon' },
         { id: 5, ready: false, desc: 'Curriculum coming soon' },
-        { id: 6, ready: true,  desc: '10 Chapters • 9 Demo Puzzles' },
+        { id: 6, ready: true,  desc: '10 Chapters • 23 Puzzles' },
         { id: 7, ready: false, desc: 'Curriculum coming soon' },
         { id: 8, ready: false, desc: 'Curriculum coming soon' }
       ];
@@ -1805,6 +1805,17 @@
             const p = seq.indexOf(i);
             return `<button class="opt${p >= 0 ? ' sel' : ''}" style="align-items:flex-start;text-align:left;padding:12px 16px" data-qact="order" data-i="${i}">${p >= 0 ? `<b>${p + 1}.</b> ` : ''}${it}</button>`;
           }).join('')}</div><button class="btn alt" data-qact="order-reset">Start again</button>`;
+        } else if (q.t === 'table-num') {
+          const vals = s.nums || [];
+          const parts = s.parts || [];
+          widget = `<div class="lg-wrapper"><table class="lg" style="width:100%">
+            <tr><th>3D Shape</th><th>Faces</th><th>Edges</th><th>Vertices</th></tr>
+            ${q.rows.map((row, r) => `<tr><th>${row.label}</th>${[0, 1, 2].map(c => {
+              const idx = r * 3 + c;
+              const cls = s.checked ? (parts[idx] ? ' ok' : ' bad') : '';
+              return `<td style="background:transparent;border:0;padding:3px"><input class="num${cls}" style="width:64px;font-size:1.05rem" type="number" inputmode="numeric" data-p="${idx}" value="${vals[idx] || ''}" aria-label="${row.label} ${['Faces','Edges','Vertices'][c]}"></td>`;
+            }).join('')}</tr>`).join('')}
+          </table></div>`;
         }
 
         const solHTML = s.stepIdx != null ? renderSolutionHTML(q, s.stepIdx) : '';
@@ -1971,6 +1982,13 @@
         if (seq.length < q.items.length) { s.msg = 'Tap all the steps in order first.'; s.checked = false; return renderBookView(); }
         ok = (seq.join(',') === q.a.join(','));
         if (!ok) s.msg = 'Not quite the right order. Tap "Start again" or check Hint!';
+      } else if (q.t === 'table-num') {
+        const flatAns = q.rows.flatMap(r => r.ans);
+        const vals = (s.nums || []).map(v => (v || '').trim());
+        if (!vals.length || vals.every(v => v === '')) { s.msg = 'Fill in the table values first.'; s.checked = false; return renderBookView(); }
+        s.parts = flatAns.map((ans, i) => vals[i] !== '' && +vals[i] === ans);
+        ok = s.parts.every(Boolean);
+        if (!ok) s.msg = `${s.parts.filter(Boolean).length} of ${flatAns.length} cells are right. Fix the red boxes and try again!`;
       }
 
       s.checked = true;

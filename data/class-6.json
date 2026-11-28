@@ -1,42 +1,545 @@
 {
   "classId": 6,
   "title": "Future Tech Minds 6",
-  "subtitle": "Computational Thinking & AI Foundations",
+  "subtitle": "Test Your Computational Thinking Skills",
   "chapters": [
     {
       "id": 1,
       "icon": "🧠",
       "title": "The Computational Thinker",
-      "skill": "Decomposition, Classification & Algorithms",
-      "learn": "<p>A <b>computational thinker</b> solves big problems the way a builder makes a robot: one small piece at a time.</p><h3>Four super-skills</h3><p><b>Decomposition</b> – break a problem into small parts.<br><b>Pattern recognition</b> – spot what repeats.<br><b>Abstraction</b> – keep what matters, ignore the rest.<br><b>Algorithms</b> – write clear steps anyone can follow.</p><h3>Simple or difficult?</h3><p>A simple problem has clear steps and one answer. A difficult problem has many choices, feelings or surprises, so we must break it down first.</p>",
+      "skill": "Decomposition, Patterns & Logical Reasoning",
+      "learn": "<p>A <b>computational thinker</b> solves big problems the way a builder makes a robot: one small piece at a time.</p><h3>Four super-skills</h3><p><b>Decomposition</b> – break a problem into small parts.<br><b>Pattern recognition</b> – spot what repeats in numbers and shapes.<br><b>Abstraction</b> – keep what matters, ignore the rest.<br><b>Algorithms</b> – write clear steps anyone can follow.</p><h3>Simple or difficult?</h3><p>A simple problem has clear steps and one answer. A difficult problem has many choices, feelings or surprises, so we must break it down first.</p>",
       "questions": [
-        { "t": "choice", "q": "Which object is needed to balance the last scale?", "vis": "🚗🚗 🚚🚚🚚 = 🚌🚌<br>🚗🚗 🚚 = 🚚🚚<br>🚗 🚚 🚌 = 🚗🚗🚗 ❓", "o": ["🚗 Car", "🚚 Truck", "🚌 Bus"], "a": 2, "hint": "Use the second scale to compare a truck with cars.", "s": ["The second scale shows 2 cars and 1 truck weigh the same as 2 trucks. Remove 1 truck from each side: 1 truck = 2 cars.", "On the last scale, 1 car + 1 truck = 1 + 2 = 3 cars. The left side already has 3 cars’ worth without the bus.", "The right side already has 3 cars, so the bus on the left must be matched by a bus on the right. Answer: Bus."] },
-        { "t": "classify", "q": "Is each everyday problem Simple or Difficult?", "items": [["Helping a friend who is feeling upset or worried", "D"], ["Organizing our school bag before leaving for school", "S"], ["Deciding what to do after missing the train", "D"], ["Following a recipe to prepare a sandwich", "S"], ["Finding a safe way home during heavy rain", "D"]], "hint": "Simple = clear steps. Difficult = many choices or feelings.", "s": ["Simple problems have clear steps and one result: packing a bag and following a recipe.", "Difficult problems involve feelings, choices or changing situations: helping a friend, missing the train, and a rainy journey home."] },
-        { "t": "choice", "q": "Each 👧 = 2 students (half = 1). X = half of (Strawberry + Banana). Y = Pear + Mango. Which fruit equals the difference between X and Y?", "vis": "🍓 👧×6<br>🍉 X<br>🍈 Y<br>🍌 👧×4<br>🍐 👧×4 + half<br>🥭 👧×6 + half", "o": ["Strawberry", "Banana", "Pear", "Mango"], "a": 0, "hint": "First turn the symbols into numbers of students.", "s": ["Full symbol = 2 students, half = 1. Strawberry 12, Banana 8, Pear 9, Mango 13.", "X = (12 + 8) ÷ 2 = 10. Y = 9 + 13 = 22.", "Difference = 22 − 10 = 12. Strawberry has 6 symbols = 12 students."] },
-        { "t": "choice", "q": "Akash: minute hand at 12, hour hand 150° clockwise from it. Chirag: hour hand at 5, minute hand 210° clockwise from it. Which is correct?", "o": ["Akash came before Chirag", "Chirag came before Akash", "Same time", "None of these"], "a": 2, "hint": "Each number on a clock is 30° apart.", "s": ["150° ÷ 30° = 5 steps from 12, so Akash’s hour hand is at 5. The time is 5:00.", "210° ÷ 30° = 7 steps from 5, which lands on 12. The minute hand is at 12, the hour hand at 5: also 5:00.", "Both came at exactly 5:00. Answer: same time."] },
-        { "t": "order", "q": "The printer will not print. Tap the steps in the correct order.", "items": ["Check the printer has paper and ink. Look for a jam or error.", "Restart the printer and computer, then print a test page.", "Open the Print box and choose the right printer.", "Check the USB cable is firmly connected at both ends.", "Check the printer is plugged in and switched on."], "a": [4, 3, 2, 0, 1], "hint": "Start with the easiest, most basic check.", "s": ["Start with power: is it plugged in and on?", "Next the cable, then the software choice in the Print box.", "Then paper, ink and jams. Restart last, if nothing else worked."], "review": "Order inferred – please confirm with the academic team." }
+        {
+          "n": "1",
+          "t": "choice",
+          "q": "Which object is required to balance the last scale?",
+          "vis": "🚗🚗 🚚🚚🚚 = 🚌🚌<br>🚗🚗 🚚 = 🚚🚚<br>🚗 🚚 🚌 = 🚗🚗🚗 ❓",
+          "o": [
+            "🚗 Car",
+            "🚚 Truck",
+            "🚌 Bus"
+          ],
+          "a": 2,
+          "hint": "Use the second scale to compare a truck with cars.",
+          "s": [
+            "The second row shows that 2 cars and 1 truck weigh the same as 2 trucks. So 1 truck weighs the same as 2 cars.",
+            "On the last scale, the 1 car and 1 truck on the left together weigh the same as 1 + 2 = 3 cars.",
+            "That leaves the bus on the left to be matched by a bus on the right. Answer: Bus."
+          ]
+        },
+        {
+          "n": "2",
+          "t": "classify",
+          "q": "Identify whether the following everyday problems are Simple or Difficult.",
+          "items": [
+            [
+              "a. Helping a friend who is feeling upset or worried.",
+              "D"
+            ],
+            [
+              "b. Organizing our school bag before leaving for school.",
+              "S"
+            ],
+            [
+              "c. Deciding what to do after missing the train.",
+              "D"
+            ],
+            [
+              "d. Following a recipe to prepare a sandwich.",
+              "S"
+            ],
+            [
+              "e. Finding a safe way home during heavy rain.",
+              "D"
+            ]
+          ],
+          "hint": "Simple = clear steps with one outcome. Difficult = many choices, feelings, or changing situations.",
+          "s": [
+            "Simple problems have clear steps and one result: organizing a school bag (b) and following a recipe (d).",
+            "Difficult problems involve feelings, choices, or surprises: helping an upset friend (a), missing the train (c), and heavy rain (e)."
+          ]
+        },
+        {
+          "n": "3",
+          "t": "choice",
+          "q": "Study the pictograph (👧 = 2 students, half = 1). X = half of (Strawberries + Bananas). Y = Pears + Mangoes. Which fruit equals the difference between X and Y?",
+          "vis": "🍓 👧×6 (12)<br>🍉 X<br>🍈 Y<br>🍌 👧×4 (8)<br>🍐 👧×4 + half (9)<br>🥭 👧×6 + half (13)",
+          "o": [
+            "a. Strawberry",
+            "b. Banana",
+            "c. Pear",
+            "d. Mango"
+          ],
+          "a": 0,
+          "hint": "Turn each row of symbols into numbers first: full symbol = 2, half = 1.",
+          "s": [
+            "Each full symbol = 2 students, half = 1: Strawberry = 12, Banana = 8, Pear = 9, Mango = 13.",
+            "Watermelon (X) = (12 + 8) ÷ 2 = 10 students.",
+            "Muskmelon (Y) = 9 + 13 = 22 students.",
+            "Difference = 22 − 10 = 12 students. The strawberry row has 6 full symbols = 12 students. Answer: Strawberry."
+          ]
+        },
+        {
+          "n": "4a",
+          "t": "choice",
+          "q": "Spot the pattern: What will come in place of '?' in the given series?",
+          "vis": "<div style='display:flex;gap:10px;flex-wrap:wrap;justify-content:center;align-items:center'><div style='display:grid;grid-template-columns:1fr 1fr;gap:2px;background:#fff;padding:4px;border-radius:8px;color:#1d2a5b;font-weight:700;width:62px;text-align:center'><span>1</span><span>2</span><span>2</span><span>3</span></div><span>→</span><div style='display:grid;grid-template-columns:1fr 1fr;gap:2px;background:#fff;padding:4px;border-radius:8px;color:#1d2a5b;font-weight:700;width:62px;text-align:center'><span>2</span><span>3</span><span>3</span><span>4</span></div><span>→</span><div style='display:grid;grid-template-columns:1fr 1fr;gap:2px;background:#fff;padding:4px;border-radius:8px;color:#1d2a5b;font-weight:700;width:62px;text-align:center'><span>3</span><span>4</span><span>4</span><span>5</span></div><span>→</span><div style='display:grid;grid-template-columns:1fr 1fr;gap:2px;background:#fff;padding:4px;border-radius:8px;color:#1d2a5b;font-weight:700;width:62px;text-align:center'><span>4</span><span>5</span><span>5</span><span>6</span></div><span>→</span><b>❓</b></div>",
+          "o": [
+            "a. [5, 6 / 6, 8]",
+            "b. [6, 7 / 7, 8]",
+            "c. [6, 7 / 7, 7]",
+            "d. [5, 6 / 6, 7]"
+          ],
+          "a": 3,
+          "hint": "Look at each corner position separately from one square to the next.",
+          "s": [
+            "Each number increases by 1 in the same position from one square to the next.",
+            "So [4, 5 / 5, 6] becomes [5, 6 / 6, 7]. Answer: d."
+          ]
+        },
+        {
+          "n": "4b",
+          "t": "choice",
+          "q": "Spot the pattern: What will come in place of '?' in the given series?",
+          "vis": "<div style='display:flex;gap:12px;flex-wrap:wrap;justify-content:center;align-items:center;font-size:.95rem'><div>🔵3<br>🟥7<br>🔵4</div><span>→</span><div>🔵6<br>🟥11<br>🔵5</div><span>→</span><div>🔵9<br>🟥16<br>🔵7</div><span>→</span><div>🔵12<br>🟥22<br>🔵10</div><span>→</span><div>🔵15<br>🟥29<br>🔵14</div><span>→</span><b>❓</b></div>",
+          "o": [
+            "a. 17, 35, 18",
+            "b. 18, 36, 19",
+            "c. 18, 37, 18",
+            "d. 18, 37, 19"
+          ],
+          "a": 3,
+          "hint": "Check the top circle (+3), bottom circle (+1, +2, +3, +4...), and how they make the middle square.",
+          "s": [
+            "Top circle: increases by 3 each time. After 15 comes 15 + 3 = 18.",
+            "Bottom circle: increases by 1, 2, 3, and 4. The next increase is 5, so 14 + 5 = 19.",
+            "Middle square: add the two circles (18 + 19 = 37). Answer: d (18, 37, 19)."
+          ]
+        },
+        {
+          "n": "5",
+          "t": "choice",
+          "q": "Find the ODD one out.",
+          "vis": "a: [2, 🟥10, 5] &nbsp;|&nbsp; b: [5, 3, 🟥8] &nbsp;|&nbsp; c: [7, 🟥28, 4] &nbsp;|&nbsp; d: [🟥24, 8, 3]",
+          "o": [
+            "a. (2, 10, 5)",
+            "b. (5, 3, 8)",
+            "c. (7, 28, 4)",
+            "d. (24, 8, 3)"
+          ],
+          "a": 1,
+          "hint": "How do the two light numbers create the red number in three of the four groups?",
+          "s": [
+            "In groups a, c, and d, the red number is the product of the two light boxes: 2×5 = 10, 7×4 = 28, 8×3 = 24.",
+            "In group b, 5 + 3 = 8 (it follows an addition rule instead of multiplication). Answer: b."
+          ]
+        },
+        {
+          "n": "6",
+          "t": "choice",
+          "q": "An 8×8 land grid (each square = 30m × 30m) is split into Green (20 squares), Blue (23 squares), and Purple (21 squares), then redistributed equally. Which option does NOT represent land gained or lost by any house?",
+          "vis": "Total = 64 squares × 900 sq.m = 57,600 sq.m → Equal share = 19,200 sq.m<br>Green: 20 sq (18,000) | Blue: 23 sq (20,700) | Purple: 21 sq (18,900)",
+          "o": [
+            "a. 1200 sq. m.",
+            "b. 1500 sq. m.",
+            "c. 300 sq. m.",
+            "d. 900 sq. m."
+          ],
+          "a": 3,
+          "hint": "Subtract each house's original area from 19,200 sq. m.",
+          "s": [
+            "Each square = 30 × 30 = 900 sq. m. Total = 64 × 900 = 57,600 sq. m, so each house gets 57,600 ÷ 3 = 19,200 sq. m.",
+            "Green (20 sq = 18,000) gains 1,200 sq. m. Blue (23 sq = 20,700) loses 1,500 sq. m. Purple (21 sq = 18,900) gains 300 sq. m.",
+            "No house gains or loses 900 sq. m. Answer: d."
+          ]
+        },
+        {
+          "n": "7",
+          "t": "choice",
+          "q": "Akash: minute hand at 12, hour hand 150° clockwise from it. Chirag: hour hand at 5, minute hand 210° clockwise from it. Which statement is correct?",
+          "o": [
+            "a. Akash visited the park before Chirag",
+            "b. Chirag visited the park before Akash",
+            "c. Akash and Chirag visited the park at exactly the same time",
+            "d. None of the above"
+          ],
+          "a": 2,
+          "hint": "Each step from one number to the next on a clock covers 30°.",
+          "s": [
+            "Akash: 150° ÷ 30° = 5 steps clockwise from 12, so the hour hand is at 5 (5:00 p.m.).",
+            "Chirag: 210° ÷ 30° = 7 steps clockwise from 5, which lands on 12. Hour at 5, minute at 12 = 5:00 p.m.",
+            "Both visited at exactly 5:00 p.m. Answer: c."
+          ]
+        },
+        {
+          "n": "8",
+          "t": "order",
+          "q": "The printer connected to the computer is not responding. Tap the troubleshooting steps in the correct order (1 to 5).",
+          "items": [
+            "Check that the printer has paper and enough ink or toner. Look for a paper jam or an error message.",
+            "If the printer still does not respond, restart both the printer and the computer, then print a test page.",
+            "Open the Print dialog box and make sure the correct printer is selected.",
+            "Make sure the USB cable is securely connected to both the printer and the computer.",
+            "Check that the printer is plugged in and switched on."
+          ],
+          "a": [
+            4,
+            3,
+            2,
+            0,
+            1
+          ],
+          "hint": "Start with the simplest physical check (power), then cable, software, consumables, and restart last.",
+          "s": [
+            "Step 1: Check that the printer is plugged in and switched on.",
+            "Step 2: Make sure the USB cable is securely connected.",
+            "Step 3: Open the Print dialog box and choose the correct printer.",
+            "Step 4: Check paper, ink/toner, and jams.",
+            "Step 5: Restart both printer and computer, then print a test page."
+          ]
+        }
       ]
     },
     {
       "id": 2,
       "icon": "🔍",
       "title": "The Power of Abstract Thinking",
-      "skill": "Abstraction & Pattern Prediction",
-      "learn": "<p><b>Abstraction</b> means keeping the important details and ignoring the rest. A map does not show every leaf, only roads and landmarks.</p><h3>Look for what matters</h3><p>Numbers in a table, neighbours in a grid, or the shape of an edge: find the rule, then use it again and again.</p><h3>Predict with patterns</h3><p>If something grows by the same amount each time, you can predict what comes next.</p>",
+      "skill": "Abstraction, Spatial & Pattern Reasoning",
+      "learn": "<p><b>Abstraction</b> means keeping the important details and ignoring the rest. A map does not show every leaf—only roads and landmarks.</p><h3>Spatial &amp; Visual Thinking</h3><p>When rotating shapes, flipping mirror or water images, or finding 3D faces/edges/vertices, focus on key edges, corners, and directions.</p><h3>Predict with Patterns</h3><p>If numbers or jumps follow a steady rule, you can predict what comes next.</p>",
       "questions": [
-        { "t": "choice", "q": "Shoot ❌ one item in each box. It disappears along with identical items in neighbouring boxes. Most items you can remove after 3 shots?", "vis": "Box 1: 🔺 🔶 🔵 🛑<br>Box 2: ⬣ 🔶 ✴️ 🔺<br>Box 3: 🔵 🔺 ⬣ 🟩", "o": ["3", "5", "6", "7"], "a": 3, "hint": "The middle box touches both outer boxes. Which shape is in all three?", "s": ["Left shot: red diamond removes 2 (left and middle).", "Middle shot: yellow triangle removes 3 (one in each box).", "Right shot: pink octagon removes 2 (middle and right). Total: 2 + 3 + 2 = 7."] },
-        { "t": "choice", "q": "How many blocks touch at least one smaller and one larger number?", "vis": "235 – 410 – 381<br>167 – 453 – 579<br>284 – 831 – 531<br>(blocks joined by lines in a 3×3 grid)", "o": ["2", "3", "4", "5"], "a": 2, "hint": "Check each block’s linked neighbours only.", "s": ["Count only blocks joined by a line.", "235 (167 and 410), 410 (235 and 453), 453 (410 and 579) and 284 (167 and 831) each have a smaller and a larger neighbour.", "That makes 4 blocks."] },
-        { "t": "number", "q": "Sandwiches sold in weeks 1–5: 100, 125, 150, 175, 200. How many in week 6?", "hint": "How much does it grow each week?", "a": 225, "s": ["Look at the gaps: 125 − 100 = 25, 150 − 125 = 25 and so on.", "Sales grow by 25 every week.", "Week 6 = 200 + 25 = 225."] },
-        { "t": "number", "q": "A rabbit starts at −8 on this line: −12, −10, ⬜, −4, ⬜, 0 … 6, 8, … 14. It jumps to the 9th point right, then the 7th point left. Add the values of all places it landed, including the start.", "hint": "The points are 2 apart.", "a": -2, "review": "Solution drafted by AI – needs approval.", "s": ["Points are 2 apart: −12, −10, −8, −6, −4, −2, 0 …", "From −8, 9 points right: −8 + 18 = 10.", "From 10, 7 points left: 10 − 14 = −4.", "Sum: −8 + 10 + (−4) = −2."] }
+        {
+          "n": "1",
+          "t": "choice",
+          "q": "Shoot (✕) exactly one item in each box. It is removed along with any identical items in adjacent boxes. What is the maximum number of items you can eliminate?",
+          "vis": "Box 1: 🔺 🔶 🔵 🟠<br>Box 2: ⬣ 🔶 ★ 🔺<br>Box 3: 🔵 🔺 ⬣ 🟩",
+          "o": [
+            "a. 3",
+            "b. 5",
+            "c. 6",
+            "d. 7"
+          ],
+          "a": 3,
+          "hint": "The middle box is adjacent to both outer boxes. Which shape appears in all three?",
+          "s": [
+            "Left box: shoot Red Diamond (🔶) → removes 2 (left and middle).",
+            "Middle box: shoot Yellow Triangle (🔺) → removes 3 (one in each box).",
+            "Right box: shoot Pink Octagon (⬣) → removes 2 (middle and right).",
+            "Total: 2 + 3 + 2 = 7 items. Answer: d."
+          ]
+        },
+        {
+          "n": "2",
+          "t": "choice",
+          "q": "Count the number of blocks that are connected to at least one smaller number and one larger number than the number in it.",
+          "vis": "235 — 410 — 381<br>&nbsp;|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;|<br>167 — 453 — 579<br>&nbsp;|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;|<br>284 — 831 — 531",
+          "o": [
+            "a. 2",
+            "b. 3",
+            "c. 4",
+            "d. 5"
+          ],
+          "a": 2,
+          "hint": "Check only neighbours joined by a direct line.",
+          "s": [
+            "Check each block's linked neighbours:",
+            "235 has 167 (smaller) and 410 (larger). 410 has 235 (smaller) and 453 (larger).",
+            "453 has 410 (smaller) and 579 (larger). 284 has 167 (smaller) and 831 (larger).",
+            "That makes 4 blocks. Answer: c."
+          ]
+        },
+        {
+          "n": "3",
+          "t": "number",
+          "q": "A school canteen recorded sandwiches sold over five weeks: Week 1: 100, Week 2: 125, Week 3: 150, Week 4: 175, Week 5: 200. How many will be sold in Week 6?",
+          "hint": "Look at how much sales grow from one week to the next.",
+          "a": 225,
+          "s": [
+            "Look at the gaps: 125 − 100 = 25, 150 − 125 = 25, and so on.",
+            "Sales increase by 25 sandwiches every week.",
+            "Week 6 = 200 + 25 = 225 sandwiches."
+          ]
+        },
+        {
+          "n": "4",
+          "t": "choice",
+          "q": "Which option, when placed together with the given figure (touching without overlapping), will form a complete rectangle or square?",
+          "vis": "<svg viewBox='0 0 80 70' width='90' height='78' style='background:#fff;border-radius:10px;padding:4px'><polyline points='45,10 65,10 65,60 45,60 25,45 40,35 25,25 45,10' fill='none' stroke='#1d2a5b' stroke-width='4' stroke-linejoin='round'/></svg>",
+          "o": [
+            "a. Zigzag matching left cutout",
+            "b. Double-arrow cutout",
+            "c. Triple-tooth cutout",
+            "d. Slanted notch cutout"
+          ],
+          "a": 0,
+          "hint": "The given shape has one inward notch on the left. Look for the matching single outward-and-inward zigzag.",
+          "s": [
+            "The zigzag edge of option a fits exactly against the zigzag edge of the given figure.",
+            "When the two pieces are joined, their straight outer edges form a complete rectangle. Answer: a."
+          ]
+        },
+        {
+          "n": "5",
+          "t": "table-num",
+          "q": "Fill in the number of Faces, Edges, and Vertices for each 3D shape.",
+          "rows": [
+            {
+              "label": "🟥 Cube",
+              "ans": [
+                6,
+                12,
+                8
+              ]
+            },
+            {
+              "label": "🔺 Cone",
+              "ans": [
+                2,
+                1,
+                1
+              ]
+            },
+            {
+              "label": "🟪 Cuboid",
+              "ans": [
+                6,
+                12,
+                8
+              ]
+            },
+            {
+              "label": "🔵 Sphere",
+              "ans": [
+                1,
+                0,
+                0
+              ]
+            },
+            {
+              "label": "🟨 Cylinder",
+              "ans": [
+                3,
+                2,
+                0
+              ]
+            },
+            {
+              "label": "🔶 Square-based pyramid",
+              "ans": [
+                5,
+                8,
+                5
+              ]
+            }
+          ],
+          "hint": "Remember: a Sphere has 1 curved face and 0 edges/vertices; a Cylinder has 3 faces (2 flat + 1 curved) and 2 circular edges.",
+          "s": [
+            "Cube & Cuboid: 6 faces, 12 edges, 8 vertices.",
+            "Cone: 2 faces, 1 edge, 1 vertex. Sphere: 1 face, 0 edges, 0 vertices.",
+            "Cylinder: 3 faces, 2 edges, 0 vertices. Square-based pyramid: 5 faces, 8 edges, 5 vertices."
+          ]
+        },
+        {
+          "n": "6",
+          "t": "choice",
+          "q": "Sophia and her friends are flying over a town. Which top-view pattern matches Building B (slanted grey roof beside a small brown front wing)?",
+          "o": [
+            "a. Grey vertical strip + brown top-right square",
+            "b. Grey left strip + brown lower-right rectangle",
+            "c. Grey left strip + brown upper-right rectangle",
+            "d. Grey & brown full side-by-side rectangles"
+          ],
+          "a": 1,
+          "hint": "Look straight down from above: the slanted grey roof forms a full left strip, and the brown wing sits at the lower-right.",
+          "s": [
+            "From directly above, slopes appear flat.",
+            "Building B has the grey roof spanning the left side and the brown section at the lower-right. Answer: b."
+          ]
+        },
+        {
+          "n": "7",
+          "t": "choice",
+          "q": "The given black-and-white pinwheel image can be rotated clockwise or anticlockwise. Which option CANNOT be obtained by rotating it?",
+          "o": [
+            "a. 180° rotated pinwheel",
+            "b. Mirror-flipped pinwheel",
+            "c. 90° clockwise pinwheel",
+            "d. 90° anticlockwise pinwheel"
+          ],
+          "a": 1,
+          "hint": "Rotating a shape never flips its handedness (clockwise curl stays clockwise).",
+          "s": [
+            "Options a, c, and d are 180°, 90° clockwise, and 90° anticlockwise rotations of the original.",
+            "Option b is mirror-flipped (reversed direction), so it cannot be obtained by rotation. Answer: b."
+          ]
+        },
+        {
+          "n": "8",
+          "t": "choice",
+          "q": "Left box has blue square at bottom-left; right box has blue square at bottom-right. If both shift to the next corner clockwise, how will they look?",
+          "o": [
+            "a. [Bottom-Left, Top-Right]",
+            "b. [Top-Left, Top-Right]",
+            "c. [Top-Left, Bottom-Right]",
+            "d. [Top-Left, Bottom-Left]"
+          ],
+          "a": 3,
+          "hint": "Clockwise corners go: Bottom-Left → Top-Left → Top-Right → Bottom-Right → Bottom-Left.",
+          "s": [
+            "Left box: Bottom-Left moves 1 step clockwise → Top-Left.",
+            "Right box: Bottom-Right moves 1 step clockwise → Bottom-Left.",
+            "Result: [Top-Left, Bottom-Left]. Answer: d."
+          ]
+        },
+        {
+          "n": "9a",
+          "t": "choice",
+          "q": "Which option shows the correct mirror image (left ↔ right) of the clown face?",
+          "o": [
+            "a. Upside-down clown (left)",
+            "b. Upright horizontally flipped clown",
+            "c. Upside-down clown (right)",
+            "d. Upside-down inverted hat clown"
+          ],
+          "a": 1,
+          "hint": "A vertical mirror flips left and right, NOT top and bottom—the party hat stays on top!",
+          "s": [
+            "A mirror image keeps the top at the top and flips left ↔ right.",
+            "Only option b stays upright with left and right features mirrored. Answer: b."
+          ]
+        },
+        {
+          "n": "9b",
+          "t": "choice",
+          "q": "Which option shows the correct mirror image of the purple letter 'Q'?",
+          "o": [
+            "a. Rotated 90° clockwise",
+            "b. Rotated upside-down",
+            "c. Tilted sideways",
+            "d. Upright with tail pointing bottom-left"
+          ],
+          "a": 3,
+          "hint": "In a vertical mirror, a tail pointing bottom-right flips to point bottom-left.",
+          "s": [
+            "The original 'Q' has its tail on the bottom-right.",
+            "Mirrored left ↔ right, it stays upright with the tail pointing bottom-left. Answer: d."
+          ]
+        },
+        {
+          "n": "10a",
+          "t": "choice",
+          "q": "An arrow points diagonally up-right (↗). Which option shows its correct water image (top ↔ bottom reflection)?",
+          "o": [
+            "a. Arrow pointing down-right (↘) with reflected feathers",
+            "b. Arrow pointing down-right (↘) with reversed tip",
+            "c. Arrow pointing down-left (↙)",
+            "d. Arrow pointing up-right (↗)"
+          ],
+          "a": 0,
+          "hint": "A water image flips top and bottom, keeping left on the left and right on the right.",
+          "s": [
+            "The tail stays on the left and the arrowhead stays on the right, while top flips to bottom.",
+            "So ↗ flips vertically to ↘ with matching reflected feathers. Answer: a."
+          ]
+        },
+        {
+          "n": "10b",
+          "t": "choice",
+          "q": "An upright triangle (△) has a horizontal line above it and 'W' inside. Which option shows its correct water image?",
+          "o": [
+            "a. Inverted triangle (▽), line at bottom, wide 'M' inside",
+            "b. Inverted triangle (▽), line at bottom, narrow 'M' inside",
+            "c. Inverted triangle (▽), line at bottom, 'W' inside",
+            "d. Inverted triangle (▽), line at top, 'W' inside"
+          ],
+          "a": 0,
+          "hint": "Flipping top ↔ bottom turns △ into ▽, moves the top line to the bottom, and flips 'W' into 'M'.",
+          "s": [
+            "In water reflection, the horizontal line moves from top to bottom and △ flips to ▽.",
+            "The letter 'W' flips upside-down to become 'M' with the same width. Answer: a."
+          ]
+        },
+        {
+          "n": "11",
+          "t": "choice",
+          "q": "Figure A ([1, 4, _] / [2, _, 3]) is placed over Figure B ([_, 2, 3] / [_, 4, 1]) to form a 3×3 square grid. Which same digits will be positioned exactly on top of each other?",
+          "vis": "Figure A: [1, 4, ⬜] / [2, ⬜, 3]<br>Figure B: [⬜, 2, 3] / [⬜, 4, 1]",
+          "o": [
+            "a. 1",
+            "b. 3",
+            "c. 4",
+            "d. 2"
+          ],
+          "a": 1,
+          "hint": "To form a 3×3 square grid from two 2×3 grids, place A's bottom row over B's top row!",
+          "s": [
+            "Placing Row 2 of Figure A ([2, _, 3]) over Row 1 of Figure B ([_, 2, 3]) creates a 3×3 square grid.",
+            "In the right-most column, 3 sits directly on top of 3. Answer: b (3)."
+          ]
+        },
+        {
+          "n": "12",
+          "t": "number",
+          "q": "A rabbit starts at −8 on this line: −12, −10, ⬜, −4, ⬜, 0 … 6, 8, … 14. It jumps to the 9th point right, then the 7th point left. What is the sum of all places it landed, including the start?",
+          "hint": "Each tick mark is 2 apart.",
+          "a": -2,
+          "review": "Solution drafted by AI – needs approval.",
+          "s": [
+            "Points are 2 apart: −12, −10, −8, −6, −4, −2, 0 …",
+            "From −8, 9 points right: −8 + (9 × 2) = 10.",
+            "From 10, 7 points left: 10 − (7 × 2) = −4.",
+            "Sum including start: −8 + 10 + (−4) = −2."
+          ]
+        }
       ]
     },
-    { "id": 3, "icon": "🔁", "title": "Think Smart with Patterns", "comingSoon": true },
-    { "id": 4, "icon": "🪜", "title": "Solving Problems with Algorithms", "comingSoon": true },
-    { "id": 5, "icon": "💻", "title": "Begin Your Coding Journey", "comingSoon": true },
-    { "id": 6, "icon": "🐱", "title": "Build Your Ideas with Scratch", "comingSoon": true },
-    { "id": 7, "icon": "🎮", "title": "Code Smarter with Scratch", "comingSoon": true },
-    { "id": 8, "icon": "🤖", "title": "Unlocking the Power of AI", "comingSoon": true },
-    { "id": 9, "icon": "⛽", "title": "The Brain Fuel for AI", "comingSoon": true },
-    { "id": 10, "icon": "✨", "title": "Inside the Mind of AI", "comingSoon": true }
+    {
+      "id": 3,
+      "icon": "🔁",
+      "title": "Think Smart with Patterns",
+      "comingSoon": true
+    },
+    {
+      "id": 4,
+      "icon": "🪜",
+      "title": "Solving Problems with Algorithms",
+      "comingSoon": true
+    },
+    {
+      "id": 5,
+      "icon": "💻",
+      "title": "Begin Your Coding Journey",
+      "comingSoon": true
+    },
+    {
+      "id": 6,
+      "icon": "🐱",
+      "title": "Build Your Ideas with Scratch",
+      "comingSoon": true
+    },
+    {
+      "id": 7,
+      "icon": "🎮",
+      "title": "Code Smarter with Scratch",
+      "comingSoon": true
+    },
+    {
+      "id": 8,
+      "icon": "🤖",
+      "title": "Unlocking the Power of AI",
+      "comingSoon": true
+    },
+    {
+      "id": 9,
+      "icon": "⛽",
+      "title": "The Brain Fuel for AI",
+      "comingSoon": true
+    },
+    {
+      "id": 10,
+      "icon": "✨",
+      "title": "Inside the Mind of AI",
+      "comingSoon": true
+    }
   ]
 }
