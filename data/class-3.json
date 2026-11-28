@@ -1,0 +1,116 @@
+{
+  "classId": 3,
+  "title": "Future Tech Minds 3",
+  "subtitle": "Computational Thinking Foundations",
+  "chapters": [
+    {
+      "id": 1,
+      "icon": "🧠",
+      "title": "Future Ready Thinking",
+      "skill": "Logical Reasoning, Decomposition & Classification",
+      "learn": "<p>Welcome to <b>Future Ready Thinking</b>! Computational thinking helps us solve tricky puzzles step by step—just like a friendly robot.</p><h3>Three Super-Powers You Will Use</h3><p><b>1. Logical Reasoning</b> – Use clues like balance scales or line positions to figure out what is hidden.<br><b>2. Decomposition</b> – Break a big picture into smaller parts (like counting small, medium, and big squares one size at a time).<br><b>3. Classification</b> – Group things that share a purpose (like travel vs. communication) and spot the odd one out.</p>",
+      "questions": [
+        {
+          "n": "1",
+          "skill": "Logical reasoning",
+          "type": "num",
+          "t": "Use the clues to find the number each fruit represents.",
+          "key": [10, 15, 5],
+          "scales": [
+            ["🥭🥭", 20, "🥭"],
+            ["🍎🥭", 25, "🍎"],
+            ["🍓🍓🍎", 25, "🍓"]
+          ],
+          "tip20": "Two mangoes together make 20. Share that between them!",
+          "hints": [
+            "Start with the scale that has only one kind of fruit.",
+            "Once you know the mango, use it in the second scale.",
+            "Two strawberries and an apple make 25. You already know the apple!"
+          ],
+          "steps": [
+            { "t": "Two mangoes balance 20, so one mango is 20 ÷ 2 = 10.", "v": "<div class=\"eq\">🥭 + 🥭 = 20</div><div class=\"eq\">🥭 = 10</div>" },
+            { "t": "An apple and a mango balance 25. The mango is 10, so the apple is 25 − 10 = 15.", "v": "<div class=\"eq\">🍎 + 🥭(10) = 25</div><div class=\"eq\">🍎 = 15</div>" },
+            { "t": "Two strawberries and an apple balance 25. Two strawberries = 25 − 15 = 10, so one strawberry is 10 ÷ 2 = 5.", "v": "<div class=\"eq\">🍓 + 🍓 + 🍎(15) = 25</div><div class=\"eq\">🍓 = 5</div>" }
+          ]
+        },
+        {
+          "n": "2",
+          "skill": "Decomposition",
+          "type": "squares",
+          "t": "How many squares are there in this picture?",
+          "key": [14],
+          "hints": [
+            "Count the small squares first.",
+            "Now look for bigger squares made of 4 small ones.",
+            "Don’t forget the biggest square around everything."
+          ],
+          "steps": [
+            { "t": "Count the small 1×1 squares: there are 9.", "sq": 1 },
+            { "t": "Look for 2×2 squares: there are 4.", "sq": 2 },
+            { "t": "There is 1 big 3×3 square.", "sq": 3 },
+            { "t": "Add them up: 9 + 4 + 1 = 14 squares.", "sq": 0, "eq": "9 + 4 + 1 = 14" }
+          ]
+        },
+        {
+          "n": "3a",
+          "skill": "Classification",
+          "type": "mcq",
+          "t": "Find the one that is different from the others.",
+          "emojis": ["✉️", "☎️", "✈️", "🖥️"],
+          "names": ["Letter", "Telephone", "Aeroplane", "Computer"],
+          "key": [2],
+          "hints": ["Say the name of each picture out loud.", "Three pictures belong to the same group. What do they do?"],
+          "why": "Letter, telephone and computer are ways to communicate. The aeroplane is for travel, so C is different."
+        },
+        {
+          "n": "3b",
+          "skill": "Classification",
+          "type": "mcq",
+          "t": "Find the one that is different from the others.",
+          "emojis": ["🚁", "🚌", "🚆", "📺"],
+          "names": ["Helicopter", "Bus", "Train", "Television"],
+          "key": [3],
+          "hints": ["Say the name of each picture out loud.", "Three pictures belong to the same group. What do they do?"],
+          "why": "Helicopter, bus and train are used for travel. The television is not, so D is different."
+        },
+        {
+          "n": "3c",
+          "skill": "Classification",
+          "type": "mcq",
+          "t": "Find the one that is different from the others.",
+          "emojis": ["🐔", "🐘", "🦌", "🐄"],
+          "names": ["Hen", "Elephant", "Deer", "Cow"],
+          "key": [0],
+          "hints": ["Say the name of each picture out loud.", "Count how many legs each animal has."],
+          "why": "Elephant, deer and cow walk on four legs. The hen has two legs, so A is different."
+        },
+        {
+          "n": "4",
+          "skill": "Logical reasoning",
+          "type": "grid",
+          "t": "Who is first? Use the clues to find each kid's place in the ice cream line. Tap a box to mark it.",
+          "say": "Clue 1: Anika is not the last. Clue 2: Alisha is in the exact middle. Clue 3: The person with the shortest name is first. Clue 4: Chirag stands right behind Ellie.",
+          "names": ["Alisha", "Anika", "Zoya", "Chirag", "Ellie"],
+          "clues": [
+            "<b>Anika</b> is not the last to order.",
+            "<b>Alisha</b> ends up in exactly the middle of the line.",
+            "The person with the shortest name is first in line.",
+            "<b>Chirag</b> is <b>Ellie's</b> big brother, so he stays right behind her."
+          ],
+          "key": [2, 1, 0, 4, 3],
+          "hints": [
+            "Start with the clue that gives an exact place: who is in the middle?",
+            "Count the letters in each name to find the shortest.",
+            "Chirag and Ellie need two places side by side."
+          ],
+          "steps": [
+            { "t": "Clue 2: Alisha is in the exact middle, so she is 3rd.", "line": { "3": "Alisha" } },
+            { "t": "Clue 3: Zoya has the shortest name (4 letters), so she is 1st.", "line": { "1": "Zoya", "3": "Alisha" } },
+            { "t": "Clue 4: Chirag is right behind Ellie. Ellie is 4th, Chirag is 5th.", "line": { "1": "Zoya", "3": "Alisha", "4": "Ellie", "5": "Chirag" } },
+            { "t": "Clue 1: Anika is not last. Only place 2 is left.", "line": { "1": "Zoya", "2": "Anika", "3": "Alisha", "4": "Ellie", "5": "Chirag" } }
+          ]
+        }
+      ]
+    }
+  ]
+}

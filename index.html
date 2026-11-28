@@ -3,14 +3,13 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <meta name="description" content="Future Tech Minds 3 – Interactive Computational Thinking for Kids">
+  <meta name="description" content="Future Tech Minds – Interactive 3D Computational Thinking E-Book for Schools">
   <meta name="theme-color" content="#3a57e8">
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <link rel="manifest" href="/manifest.json">
-  <title>Future Tech Minds 3 – Interactive Computational Thinking</title>
+  <title>Future Tech Minds – Interactive 3D E-Book</title>
 
-  <!-- Fredoka font embedded locally (zero internet required) -->
   <style>
 @font-face {
   font-family: 'Fredoka';
@@ -78,7 +77,7 @@
   </style>
 
   <style>
-    /* ========== TOKENS ========== */
+    /* ========== DESIGN TOKENS ========== */
     :root {
       --bg1: #d9f1ff;
       --bg2: #ffe6f1;
@@ -89,13 +88,12 @@
       --acc2: #e8346a;
       --good: #0e8f5c;
       --bad: #d23b31;
+      --sun: #ffc83d;
       --line: #cdd7fa;
       --tile: #eef2ff;
       --radius-lg: 24px;
       --radius-pill: 99px;
-      --shadow-card: 0 14px 40px rgba(20,30,90,.18);
-      --transition-fast: 0.15s ease;
-      --transition-mid: 0.3s ease;
+      --shadow-card: 0 14px 40px rgba(20, 30, 90, 0.16);
       --font-base: 'Fredoka', 'Trebuchet MS', system-ui, sans-serif;
     }
 
@@ -109,16 +107,7 @@
         --tile: #222c63;
       }
     }
-    :root[data-theme="dark"] {
-      --bg1: #0f1736; --bg2: #2a1240;
-      --card: #18204af5; --ink: #eef1ff;
-      --mut: #aab4e8; --acc: #5a70ff;
-      --acc2: #e8457a; --good: #3ddc97;
-      --bad: #ff7d72; --line: #334088;
-      --tile: #222c63;
-    }
 
-    /* ========== RESET ========== */
     *, *::before, *::after {
       box-sizing: border-box;
       margin: 0;
@@ -129,148 +118,341 @@
     html {
       width: 100%;
       background: var(--bg1);
-      /* Prevent overscroll flash on mobile */
       overscroll-behavior: none;
     }
 
     body {
       width: 100%;
       min-height: 100vh;
-      min-height: 100dvh; /* dynamic viewport for mobile browsers */
+      min-height: 100dvh;
       font-family: var(--font-base);
       color: var(--ink);
       background: linear-gradient(160deg, var(--bg1), var(--bg2)) fixed;
       overflow-x: hidden;
-      /* Smooth scroll only on desktop; on mobile let native handle it */
-      scroll-behavior: auto;
     }
 
     [hidden] { display: none !important; }
 
-    /* ========== SCROLL ANIMATION SECTION ========== */
+    /* ========== CUSTOM ATMOSPHERIC CURSOR ========== */
+    [data-cursor] {
+      position: fixed;
+      left: 0;
+      top: 0;
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      border: 2px solid var(--acc);
+      background: rgba(58, 87, 232, 0.12);
+      z-index: 9999;
+      pointer-events: none;
+      transform: translate3d(-50%, -50%, 0);
+      will-change: transform;
+      display: grid;
+      place-items: center;
+      font-size: 9px;
+      font-weight: 700;
+      color: var(--ink);
+    }
+    @media (prefers-reduced-motion: reduce), (pointer: coarse) {
+      [data-cursor] { display: none !important; }
+    }
+
+    /* ========== MOTION MASK HELPERS ========== */
+    .motion-line-mask,
+    .motion-word-mask {
+      display: inline-block;
+      overflow: hidden;
+      vertical-align: top;
+    }
+    .motion-line,
+    .motion-word {
+      display: inline-block;
+      will-change: transform, opacity, filter;
+    }
+
+    /* ========== TOP GLASS NAVIGATION ========== */
+    .site-nav {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 20;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: calc(12px + env(safe-area-inset-top, 0px)) clamp(14px, 4vw, 36px) 12px;
+      background: color-mix(in srgb, var(--card) 78%, transparent);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border-bottom: 1px solid var(--line);
+      transition: opacity 0.35s ease, transform 0.35s ease;
+    }
+    .site-nav.hide { opacity: 0; pointer-events: none; transform: translateY(-100%); }
+
+    .nav-brand {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-weight: 700;
+      font-size: clamp(0.95rem, 2.2vw, 1.15rem);
+      color: var(--ink);
+      white-space: nowrap;
+    }
+    .nav-brand b { color: var(--acc2); }
+
+    .nav-right {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: nowrap;
+    }
+
+    /* ========== CINEMATIC LANDING PAGE ========== */
     #cover-view {
       position: relative;
-      width: 100%;
-      /* 400vh on desktop, 500vh on mobile for more scroll room */
-      height: 400vh;
-    }
-
-    @media (max-width: 600px) {
-      #cover-view { height: 500vh; }
-    }
-
-    .canvas-fixed {
-      position: fixed;
-      inset: 0;
-      width: 100vw;
-      height: 100vh;
-      height: 100dvh;
-      z-index: 1;
-      overflow: hidden;
-      pointer-events: none;
-      /* Use GPU compositing layer for smooth blurring */
-      will-change: opacity, filter;
-      transition: opacity 0.5s ease, filter 0.5s ease;
-    }
-
-    .canvas-fixed.blurred {
-      opacity: 0.12;
-      filter: blur(10px) brightness(0.6);
-    }
-
-    canvas {
-      display: block;
-      width: 100%;
-      height: 100%;
-      /* Keep on GPU layer for smooth paint */
-      will-change: transform;
-      image-rendering: auto;
-    }
-
-    /* ========== COVER OVERLAY ========== */
-    .cover-overlay {
-      position: fixed;
-      inset: 0;
       z-index: 2;
-      pointer-events: none;
-      display: flex;
-      flex-direction: column;
-      justify-content: space-between;
+      width: 100%;
+    }
+
+    .hero-section {
+      min-height: 100vh;
+      min-height: 100dvh;
+      display: grid;
+      grid-template-columns: minmax(0, 1.05fr) minmax(0, 1.15fr);
       align-items: center;
-      /* Safe area insets for iPhone notch */
-      padding:
-        calc(20px + env(safe-area-inset-top, 0px))
-        20px
-        calc(28px + env(safe-area-inset-bottom, 0px));
-      text-align: center;
-      transition: opacity 0.4s ease;
+      gap: clamp(24px, 4vw, 56px);
+      max-width: 1240px;
+      margin: 0 auto;
+      padding: calc(90px + env(safe-area-inset-top, 0px)) clamp(16px, 4vw, 40px) 48px;
+    }
+    @media (max-width: 900px) {
+      .hero-section {
+        grid-template-columns: 1fr;
+        text-align: center;
+        padding-top: calc(84px + env(safe-area-inset-top, 0px));
+        gap: 24px;
+      }
     }
 
-    .cover-overlay.hide {
-      opacity: 0;
-      pointer-events: none;
-    }
-
-    .brand-pill {
+    .hero-eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
       background: var(--card);
       border: 2px solid var(--line);
       border-radius: var(--radius-pill);
-      padding: 0.5em 1.4em;
+      padding: 6px 14px;
+      font-size: 0.82rem;
       font-weight: 700;
-      font-size: clamp(0.95rem, 3vw, 1.2rem);
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      color: var(--acc);
+      margin-bottom: 16px;
+    }
+
+    .hero-title {
+      font-size: clamp(2.2rem, 5.2vw, 4rem);
+      line-height: 1.06;
       color: var(--ink);
-      box-shadow: 0 6px 20px rgba(20,30,90,.12);
+      margin-bottom: 16px;
+    }
+    .hero-title .accent {
+      background: linear-gradient(90deg, var(--acc), var(--acc2));
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+    }
+
+    .hero-sub {
+      font-size: clamp(1rem, 2.2vw, 1.2rem);
+      line-height: 1.55;
+      color: var(--mut);
+      max-width: 48ch;
+      margin-bottom: 26px;
+    }
+    @media (max-width: 900px) {
+      .hero-sub { margin-left: auto; margin-right: auto; }
+    }
+
+    .hero-ctas {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+    @media (max-width: 900px) {
+      .hero-ctas { justify-content: center; }
+    }
+
+    .hero-stage {
+      position: relative;
+      border-radius: 28px;
+      overflow: hidden;
+      aspect-ratio: 16 / 9;
+      background: #f7f1e8;
+      border: 3px solid var(--card);
+      box-shadow: 0 28px 70px rgba(20, 30, 90, 0.22);
+      will-change: transform;
+    }
+    .hero-stage img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+      will-change: transform;
+    }
+
+    /* ========== PINNED 3D SCROLL STORY SCENE ========== */
+    .story-scene {
+      position: relative;
+      min-height: 100vh;
+      min-height: 100dvh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: calc(74px + env(safe-area-inset-top, 0px)) clamp(14px, 4vw, 40px) 28px;
+      overflow: hidden;
+    }
+    .story-grid {
+      width: 100%;
+      max-width: 1220px;
+      display: grid;
+      grid-template-columns: minmax(0, 1.35fr) minmax(0, 0.85fr);
+      gap: clamp(18px, 3vw, 40px);
+      align-items: center;
+    }
+    @media (max-width: 900px) {
+      .story-grid {
+        grid-template-columns: 1fr;
+        gap: 16px;
+      }
+    }
+
+    .canvas-stage {
+      position: relative;
+      width: 100%;
+      aspect-ratio: 16 / 9;
+      border-radius: 26px;
+      overflow: hidden;
+      background: #f7f1e8;
+      border: 3px solid var(--card);
+      box-shadow: 0 24px 64px rgba(20, 30, 90, 0.22);
+    }
+    .canvas-stage canvas {
+      display: block;
+      width: 100%;
+      height: 100%;
+      will-change: transform;
+    }
+    .canvas-fixed {
+      position: fixed;
+      inset: 0;
+      z-index: 1;
+      pointer-events: none;
+      opacity: 0;
+      transition: opacity 0.45s ease;
+    }
+    .canvas-fixed.blurred {
+      opacity: 0.14;
+      filter: blur(12px) brightness(0.75);
+      background: linear-gradient(160deg, var(--bg1), var(--bg2));
+    }
+
+    .story-beats {
+      position: relative;
+      min-height: 220px;
+      display: grid;
+      align-items: center;
+    }
+    .story-beat {
+      grid-area: 1 / 1;
+      background: var(--card);
+      border: 2px solid var(--line);
+      border-radius: 24px;
+      padding: clamp(18px, 3vw, 28px);
+      box-shadow: var(--shadow-card);
       backdrop-filter: blur(12px);
       -webkit-backdrop-filter: blur(12px);
-      pointer-events: auto;
     }
-    .brand-pill b { color: var(--acc2); }
+    .beat-num {
+      display: inline-block;
+      font-size: 0.8rem;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      color: var(--acc2);
+      background: var(--tile);
+      padding: 4px 12px;
+      border-radius: var(--radius-pill);
+      margin-bottom: 10px;
+    }
+    .story-beat h3 { font-size: clamp(1.25rem, 2.8vw, 1.7rem); margin-bottom: 8px; }
+    .story-beat p { color: var(--mut); line-height: 1.55; font-size: clamp(0.95rem, 2vw, 1.06rem); }
 
-    .cover-actions {
+    /* ========== SCHOOL FEATURES & FINAL CTA ========== */
+    .features-section {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: clamp(48px, 8vw, 96px) clamp(16px, 4vw, 40px);
+    }
+    .section-head {
+      text-align: center;
+      max-width: 640px;
+      margin: 0 auto 38px;
+    }
+    .section-head h2 { font-size: clamp(1.8rem, 4vw, 2.7rem); margin-bottom: 10px; }
+    .section-head p { color: var(--mut); font-size: clamp(0.98rem, 2.2vw, 1.12rem); }
+
+    .cta-banner {
+      max-width: 1120px;
+      margin: 0 auto 56px;
+      padding: clamp(28px, 5vw, 52px) clamp(20px, 4vw, 40px);
+      border-radius: 30px;
+      background: linear-gradient(135deg, var(--acc), var(--acc2));
+      color: #fff;
+      text-align: center;
+      box-shadow: 0 24px 60px rgba(58, 87, 232, 0.25);
+    }
+    .cta-banner h2 { font-size: clamp(1.7rem, 4vw, 2.5rem); margin-bottom: 10px; }
+    .cta-banner p { opacity: 0.92; max-width: 50ch; margin: 0 auto 24px; font-size: clamp(0.98rem, 2vw, 1.12rem); }
+    .cta-banner .btn.big { background: #fff; color: var(--ink); }
+
+    .site-footer {
+      text-align: center;
+      padding: 20px 16px 40px;
+      color: var(--mut);
+      font-size: 0.92rem;
       display: flex;
       flex-direction: column;
       align-items: center;
-      gap: 14px;
-      pointer-events: auto;
-      /* Pull up slightly from bottom */
-      padding-bottom: 8px;
+      gap: 10px;
     }
 
-    /* ========== POWERED BY FITSCALEZ BADGE ========== */
+    /* ========== POWERED BY FITSCALEZ (INTERACTIVE PILL) ========== */
     .fitscalez-wrap {
-      position: fixed;
-      top: 83%;
-      left: 90%;
-      transform: translate(-50%, -50%);
-      z-index: 4;
-      pointer-events: auto;
-      display: flex;
-      flex-direction: column;
+      position: relative;
+      display: inline-flex;
       align-items: center;
-      gap: 8px;
     }
-
     .fitscalez-badge {
       position: relative;
       overflow: hidden;
       display: inline-flex;
       align-items: center;
-      gap: 8px;
-      padding: 8px 16px;
+      gap: 7px;
+      padding: 6px 14px;
       border-radius: var(--radius-pill);
       background: var(--card);
       border: 2px solid var(--line);
-      box-shadow: 0 8px 24px rgba(20, 30, 90, 0.16);
-      backdrop-filter: blur(12px);
-      -webkit-backdrop-filter: blur(12px);
+      box-shadow: 0 4px 14px rgba(20, 30, 90, 0.1);
       font: inherit;
-      font-size: clamp(0.8rem, 2.2vw, 0.95rem);
+      font-size: 0.85rem;
       color: var(--mut);
       cursor: pointer;
+      white-space: nowrap;
       touch-action: manipulation;
-      transition: transform 0.22s cubic-bezier(0.3, 1.4, 0.5, 1), box-shadow 0.22s ease, border-color 0.22s ease;
+      transition: border-color 0.25s ease, box-shadow 0.25s ease;
     }
-
     .fitscalez-badge::before {
       content: '';
       position: absolute;
@@ -280,97 +462,85 @@
       animation: fz-shimmer 4s ease-in-out infinite;
       pointer-events: none;
     }
-
     @keyframes fz-shimmer {
       0%, 60% { transform: translateX(-120%); }
       100%    { transform: translateX(120%); }
     }
-
     .fitscalez-badge:hover {
-      transform: translateY(-3px) scale(1.05);
       border-color: var(--acc);
-      box-shadow: 0 12px 28px rgba(58, 87, 232, 0.24);
+      box-shadow: 0 8px 22px rgba(58, 87, 232, 0.2);
     }
-
-    .fitscalez-badge:active {
-      transform: scale(0.96);
-    }
-
     .fitscalez-icon {
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      width: 24px;
-      height: 24px;
+      width: 22px;
+      height: 22px;
       border-radius: 50%;
       background: linear-gradient(135deg, var(--acc), var(--acc2));
       color: #fff;
-      font-size: 0.85rem;
-      box-shadow: 0 2px 8px rgba(232, 52, 106, 0.35);
-      transition: transform 0.35s ease;
+      font-size: 0.8rem;
     }
-
-    .fitscalez-badge:hover .fitscalez-icon {
-      transform: rotate(20deg) scale(1.1);
-    }
-
     .fitscalez-brand {
       font-weight: 700;
-      letter-spacing: 0.01em;
       background: linear-gradient(90deg, var(--acc), var(--acc2));
       -webkit-background-clip: text;
       background-clip: text;
       color: transparent;
     }
-
     .fitscalez-pop {
+      position: absolute;
+      top: calc(100% + 8px);
+      right: 0;
       background: var(--card);
       border: 2px solid var(--acc);
       border-radius: 16px;
       padding: 10px 14px;
-      font-size: 0.85rem;
+      font-size: 0.84rem;
       font-weight: 600;
       color: var(--ink);
       box-shadow: 0 10px 28px rgba(20, 30, 90, 0.2);
       backdrop-filter: blur(12px);
-      max-width: 240px;
+      width: 230px;
       text-align: center;
-      animation: fi 0.25s ease both;
+      z-index: 30;
+    }
+    @media (max-width: 600px) {
+      .nav-hide-sm { display: none; }
     }
 
-    .scroll-hint {
-      background: var(--card);
-      border: 2px solid var(--line);
-      border-radius: var(--radius-pill);
-      padding: 0.55em 1.3em;
-      font-weight: 600;
-      font-size: clamp(0.85rem, 2.5vw, 1rem);
-      color: var(--mut);
-      animation: bob 2s ease-in-out infinite;
-      box-shadow: 0 4px 14px rgba(0,0,0,.08);
-      backdrop-filter: blur(10px);
-      -webkit-backdrop-filter: blur(10px);
-      pointer-events: auto;
-      cursor: pointer;
-      touch-action: manipulation;
-    }
-
-    /* ========== PROGRESS BAR (Scroll indicator) ========== */
+    /* ========== SCROLL PROGRESS & LOADER ========== */
     #scroll-progress-bar {
       position: fixed;
       top: 0;
       left: 0;
-      height: 4px;
+      height: 3px;
       width: 0%;
       background: linear-gradient(90deg, var(--acc2), var(--acc));
-      z-index: 10;
-      border-radius: 0 2px 2px 0;
+      z-index: 30;
       pointer-events: none;
-      transition: width 0.1s linear;
-      will-change: width;
     }
 
-    /* ========== BUTTONS ========== */
+    #load-indicator {
+      position: fixed;
+      bottom: calc(16px + env(safe-area-inset-bottom, 0px));
+      right: 16px;
+      z-index: 25;
+      background: var(--card);
+      border: 2px solid var(--line);
+      border-radius: var(--radius-pill);
+      padding: 0.35em 1em;
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: var(--mut);
+      backdrop-filter: blur(8px);
+      transition: opacity 0.4s ease;
+      pointer-events: none;
+      white-space: nowrap;
+    }
+    #load-indicator.done { opacity: 0; }
+
+    /* ========== BUTTONS & INPUTS ========== */
     .btn {
       font: inherit;
       font-weight: 700;
@@ -380,10 +550,9 @@
       background: var(--acc);
       color: #fff;
       cursor: pointer;
-      box-shadow: 0 4px 0 rgba(0,0,0,.2);
-      transition: transform var(--transition-fast), box-shadow var(--transition-fast);
+      box-shadow: 0 4px 0 rgba(0, 0, 0, 0.2);
+      transition: transform 0.15s ease, box-shadow 0.15s ease;
       touch-action: manipulation;
-      /* Min touch target 44px */
       min-height: 44px;
       display: inline-flex;
       align-items: center;
@@ -391,35 +560,23 @@
       gap: 6px;
       white-space: nowrap;
     }
-
-    .btn:hover { transform: translateY(-2px); box-shadow: 0 6px 0 rgba(0,0,0,.18); }
-    .btn:active { transform: translateY(2px); box-shadow: 0 1px 0 rgba(0,0,0,.18); }
-
-    .btn:focus-visible,
-    .opt:focus-visible,
-    .tb:focus-visible,
-    td:focus-visible,
-    input:focus-visible { outline: 3px solid var(--acc2); outline-offset: 2px; }
-
+    .btn:active { transform: translateY(2px); box-shadow: 0 1px 0 rgba(0, 0, 0, 0.18); }
+    .btn:focus-visible, .opt:focus-visible, .tb:focus-visible, td:focus-visible, input:focus-visible, .hub-card:focus-visible {
+      outline: 3px solid var(--acc2);
+      outline-offset: 2px;
+    }
     .btn.alt {
       background: var(--tile);
       color: var(--ink);
       border: 2px solid var(--line);
       box-shadow: none;
     }
-    .btn.alt:hover { background: var(--card); transform: translateY(-1px); box-shadow: none; }
-
+    .btn.alt:hover { background: var(--card); }
     .btn.big {
-      font-size: clamp(1.1rem, 4vw, 1.4rem);
+      font-size: clamp(1.1rem, 4vw, 1.38rem);
       padding: 0.75em 2em;
-      background: var(--acc2);
-      animation: bob 1.6s ease-in-out infinite;
-      box-shadow: 0 6px 0 rgba(0,0,0,.22);
-    }
-
-    @keyframes bob {
-      0%, 100% { transform: translateY(0); }
-      50%       { transform: translateY(-6px); }
+      background: linear-gradient(135deg, var(--acc2), #ff5c8a);
+      box-shadow: 0 6px 0 rgba(0, 0, 0, 0.22);
     }
 
     .ghost {
@@ -431,68 +588,59 @@
       padding: 0.4em 1em;
       cursor: pointer;
       font-weight: 600;
-      transition: background var(--transition-fast);
       touch-action: manipulation;
       min-height: 40px;
       display: inline-flex;
       align-items: center;
+      gap: 5px;
       white-space: nowrap;
+      transition: background 0.15s ease;
     }
     .ghost:hover { background: var(--tile); }
 
-    /* ========== BOOK SECTION ========== */
-    #book-section {
+    /* ========== WORKSPACE (CLASS HUB + CHAPTERS + BOOK) ========== */
+    #app-section {
       position: relative;
       z-index: 5;
       min-height: 100vh;
       min-height: 100dvh;
       padding:
         calc(16px + env(safe-area-inset-top, 0px))
-        clamp(10px, 3vw, 20px)
-        calc(60px + env(safe-area-inset-bottom, 0px));
+        clamp(12px, 3vw, 24px)
+        calc(64px + env(safe-area-inset-bottom, 0px));
     }
 
-    #book {
+    .shell {
       width: 100%;
-      max-width: 820px;
+      max-width: 900px;
       margin: 0 auto;
-      animation: fi 0.55s cubic-bezier(0.3, 0.8, 0.4, 1) both;
-    }
-
-    @keyframes fi {
-      from { opacity: 0; transform: translateY(20px); }
-      to   { opacity: 1; transform: translateY(0); }
     }
 
     .top-bar {
       display: flex;
       align-items: center;
-      gap: 10px;
       justify-content: space-between;
+      gap: 10px;
       flex-wrap: wrap;
-      row-gap: 8px;
-      margin-bottom: 12px;
+      margin-bottom: 14px;
     }
-
     .top-bar h2 {
       margin: 0;
-      font-size: clamp(0.92rem, 3vw, 1.1rem);
+      font-size: clamp(0.95rem, 3vw, 1.12rem);
       background: var(--card);
-      padding: 0.4em 1em;
+      padding: 0.45em 1.05em;
       border-radius: var(--radius-pill);
       border: 2px solid var(--line);
       line-height: 1.25;
       max-width: 100%;
     }
     .top-bar h2 span { color: var(--acc2); }
-
     .top-controls {
       display: flex;
       align-items: center;
       gap: 8px;
       flex-wrap: wrap;
     }
-
     .pill {
       background: var(--card);
       border: 2px solid var(--line);
@@ -502,19 +650,136 @@
       white-space: nowrap;
     }
 
-    #tabs {
+    /* Student Name Bar */
+    .student-bar {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+      background: var(--tile);
+      border: 2px solid var(--line);
+      border-radius: 16px;
+      padding: 10px 14px;
+      margin-bottom: 16px;
+    }
+    .student-bar label { font-weight: 700; font-size: 0.92rem; color: var(--mut); }
+    .student-bar input {
+      font: inherit;
+      font-weight: 600;
+      padding: 6px 12px;
+      border-radius: 12px;
+      border: 2px solid var(--line);
+      background: var(--card);
+      color: var(--ink);
+      min-width: 170px;
+      flex: 1 1 170px;
+      max-width: 280px;
+    }
+
+    /* 21st.dev-inspired 3D Tilt & Spotlight Cards */
+    .hub-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(min(220px, 100%), 1fr));
+      gap: 18px;
+      perspective: 1100px;
+    }
+    .hub-card {
+      position: relative;
+      overflow: hidden;
+      font: inherit;
+      background: var(--card);
+      border: 3px solid var(--line);
+      border-radius: 22px;
+      padding: 18px;
+      text-align: left;
+      color: var(--ink);
+      box-shadow: 0 10px 26px rgba(20, 30, 90, 0.12);
+      min-height: 155px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      cursor: pointer;
+      touch-action: manipulation;
+      transform-style: preserve-3d;
+      will-change: transform;
+      transition: border-color 0.25s ease, box-shadow 0.25s ease;
+    }
+    .hub-card::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      opacity: 0;
+      background: radial-gradient(240px circle at var(--mx, 50%) var(--my, 50%), rgba(58, 87, 232, 0.14), transparent 70%);
+      transition: opacity 0.25s ease;
+    }
+    .hub-card:not([disabled]):hover::after { opacity: 1; }
+    .hub-card:not([disabled]):hover {
+      border-color: var(--acc);
+      box-shadow: 0 18px 34px rgba(58, 87, 232, 0.18);
+    }
+    .hub-card[disabled] { opacity: 0.52; cursor: default; }
+    .hub-card .big { font-size: 2.35rem; line-height: 1; transform: translateZ(18px); }
+    .hub-card h3 { margin: 0; font-size: 1.15rem; transform: translateZ(14px); }
+    .hub-card small { color: var(--mut); font-weight: 600; }
+    .hub-tag {
+      align-self: flex-start;
+      background: var(--acc2);
+      color: #fff;
+      border-radius: var(--radius-pill);
+      padding: 3px 11px;
+      font-size: 0.78rem;
+      font-weight: 700;
+      margin-top: auto;
+    }
+    .hub-tag.ok { background: var(--good); }
+
+    /* Main Book Card */
+    .page {
+      background: var(--card);
+      border-radius: var(--radius-lg);
+      padding: clamp(16px, 4vw, 28px);
+      box-shadow: var(--shadow-card);
+      border: 1px solid rgba(255, 255, 255, 0.4);
+    }
+
+    .hub-sub { color: var(--mut); font-size: clamp(0.95rem, 3vw, 1.08rem); margin: 6px 0 18px; }
+
+    /* Mode Tabs (Learn / Practice / Summary) */
+    .mode-tabs { display: flex; gap: 10px; margin-bottom: 16px; flex-wrap: wrap; }
+    .mode-tabs button {
+      font: inherit;
+      font-weight: 700;
+      padding: 9px 18px;
+      border-radius: 14px;
+      border: 2px solid var(--line);
+      background: var(--tile);
+      color: var(--ink);
+      cursor: pointer;
+      min-height: 44px;
+      transition: background 0.15s, border-color 0.15s;
+    }
+    .mode-tabs button[aria-pressed="true"] {
+      background: var(--acc);
+      color: #fff;
+      border-color: var(--acc);
+    }
+
+    /* Learn View */
+    .learn-box { font-size: clamp(1rem, 3vw, 1.12rem); line-height: 1.65; max-width: 64ch; }
+    .learn-box h3 { margin: 16px 0 6px; font-size: 1.2rem; }
+    .learn-box p { margin: 8px 0; }
+
+    /* Question Dots */
+    .q-dots {
       display: flex;
       gap: 8px;
       overflow-x: auto;
-      padding: 10px 2px 14px;
+      padding: 6px 2px 14px;
       scrollbar-width: none;
-      -ms-overflow-style: none;
-      /* Smooth scroll snap on mobile */
-      scroll-snap-type: x mandatory;
       -webkit-overflow-scrolling: touch;
     }
-    #tabs::-webkit-scrollbar { display: none; }
-
+    .q-dots::-webkit-scrollbar { display: none; }
     .tb {
       font: inherit;
       font-weight: 700;
@@ -523,59 +788,34 @@
       height: 44px;
       border-radius: 50%;
       border: 2px solid var(--line);
-      background: var(--card);
+      background: var(--tile);
       color: var(--ink);
       cursor: pointer;
-      transition: transform var(--transition-fast), background var(--transition-fast);
       flex-shrink: 0;
-      scroll-snap-align: start;
       touch-action: manipulation;
+      transition: transform 0.15s ease, background 0.15s ease;
     }
-
     .tb.dn { background: var(--good); color: #fff; border-color: var(--good); }
-    .tb.on { background: var(--acc); color: #fff; border-color: var(--acc); transform: scale(1.12); }
+    .tb.on { background: var(--acc); color: #fff; border-color: var(--acc); transform: scale(1.1); }
 
-    /* ========== QUESTION CARD ========== */
-    .page {
-      background: var(--card);
-      border-radius: var(--radius-lg);
-      padding: clamp(14px, 4vw, 26px);
-      box-shadow: var(--shadow-card);
-      transform-origin: left center;
-      animation: flip 0.6s cubic-bezier(0.25, 0.85, 0.3, 1) both;
-      border: 1px solid rgba(255,255,255,.35);
-    }
-
-    @keyframes flip {
-      from { transform: perspective(1200px) rotateY(-28deg); opacity: 0; }
-      to   { transform: perspective(1200px) rotateY(0deg);   opacity: 1; }
-    }
-
-    .meta {
-      display: flex;
-      gap: 8px;
-      align-items: center;
-      flex-wrap: wrap;
-      margin-bottom: 10px;
-    }
-
-    .chip {
-      background: var(--tile);
-      border-radius: var(--radius-pill);
-      padding: 0.2em 0.8em;
-      font-weight: 700;
-      font-size: 0.88rem;
-    }
+    .meta { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; margin-bottom: 10px; }
+    .chip { background: var(--tile); border-radius: var(--radius-pill); padding: 0.22em 0.85em; font-weight: 700; font-size: 0.88rem; }
     .chip.s { color: var(--acc2); margin-right: auto; }
+    h3.q-title { font-size: clamp(1.08rem, 3.5vw, 1.32rem); margin: 0.5em 0 0.7em; line-height: 1.4; max-width: 60ch; }
 
-    h3 {
-      font-size: clamp(1.05rem, 3.5vw, 1.3rem);
-      margin: 0.6em 0;
-      line-height: 1.4;
-      max-width: 58ch;
+    /* Visual Box */
+    .vis-box {
+      background: var(--tile);
+      border: 2px dashed var(--acc);
+      border-radius: 16px;
+      padding: 12px 16px;
+      margin: 12px 0;
+      font-size: clamp(1.05rem, 3.5vw, 1.25rem);
+      line-height: 1.85;
+      overflow-x: auto;
     }
 
-    /* ========== FRUIT BALANCE SCALE ========== */
+    /* Fruit Scales */
     .scale {
       display: flex;
       align-items: center;
@@ -592,21 +832,20 @@
     .scale label { margin-left: auto; font-weight: 700; }
 
     input.num {
-      width: 80px;
+      width: 92px;
       font: inherit;
       font-size: clamp(1.1rem, 4vw, 1.4rem);
       text-align: center;
       border: 3px solid var(--line);
       border-radius: 12px;
-      padding: 0.2em;
+      padding: 0.25em;
       background: var(--card);
       color: var(--ink);
-      touch-action: manipulation;
     }
-    input.num.ok  { border-color: var(--good); }
+    input.num.ok { border-color: var(--good); }
     input.num.bad { border-color: var(--bad); }
 
-    /* ========== SQUARE GRID ========== */
+    /* Squares Grid */
     .hg {
       display: grid;
       grid-template-columns: repeat(3, clamp(52px, 12vw, 68px));
@@ -620,21 +859,20 @@
     }
     .hg i { font-style: normal; border: 1px solid var(--mut); padding: 8px 0; background: var(--tile); }
 
-    /* ========== MCQ OPTIONS ========== */
+    /* MCQ Options */
     .ops {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(min(130px, 40%), 1fr));
+      grid-template-columns: repeat(auto-fit, minmax(min(135px, 42%), 1fr));
       gap: 12px;
       margin: 12px 0;
     }
-
     .opt {
       font: inherit;
       color: var(--ink);
       background: var(--tile);
       border: 3px solid var(--line);
       border-radius: 20px;
-      padding: clamp(10px, 3vw, 14px) 8px;
+      padding: clamp(10px, 3vw, 14px) 10px;
       cursor: pointer;
       display: flex;
       flex-direction: column;
@@ -642,420 +880,349 @@
       gap: 6px;
       transition: transform 0.18s, border-color 0.18s, background 0.18s;
       touch-action: manipulation;
-      /* Prevent long-press context menu on mobile */
       user-select: none;
-      -webkit-user-select: none;
     }
-    .opt:hover { transform: translateY(-4px) rotate(-1deg); }
+    .opt:hover { transform: translateY(-3px); }
     .opt .em { font-size: clamp(2rem, 7vw, 3rem); line-height: 1.1; }
-    .opt .lt {
-      font-weight: 700;
-      background: var(--card);
-      border-radius: 50%;
-      width: 30px;
-      height: 30px;
-      line-height: 30px;
-      text-align: center;
-    }
+    .opt .lt { font-weight: 700; background: var(--card); border-radius: 50%; width: 30px; height: 30px; line-height: 30px; text-align: center; }
     .opt.sel { border-color: var(--acc); background: var(--card); }
     .opt.ok  { border-color: var(--good); background: var(--card); }
     .opt.bad { border-color: var(--bad); }
-    .opt.hl  { border-color: var(--good); transform: scale(1.06); }
+    .opt.hl  { border-color: var(--good); transform: scale(1.05); }
     .opt.dim { opacity: 0.45; }
     .ops.st  { pointer-events: none; }
 
-    /* ========== CLUES LIST ========== */
-    ol.cl {
-      padding-left: 1.4em;
-      line-height: 1.65;
-      max-width: 58ch;
-      margin: 10px 0;
-      font-size: clamp(0.95rem, 3vw, 1.1rem);
-    }
-
-    /* ========== LINE GRID (Q4) ========== */
-    /* Make the ice cream grid scroll horizontally on small screens */
-    .lg-wrapper {
-      overflow-x: auto;
-      -webkit-overflow-scrolling: touch;
-      scrollbar-width: none;
-    }
-    .lg-wrapper::-webkit-scrollbar { display: none; }
-
-    .lg {
-      border-collapse: separate;
-      border-spacing: 4px;
-      margin: 10px 0;
-      min-width: 340px;
-    }
-    .lg th {
-      background: var(--tile);
-      border-radius: 10px;
-      padding: 7px 10px;
-      text-align: left;
-      white-space: nowrap;
-      font-size: clamp(0.85rem, 2.5vw, 1rem);
-    }
-    .lg tr.ok  th { background: var(--good); color: #fff; }
-    .lg tr.bad th { background: var(--bad);  color: #fff; }
-    .lg td {
-      width: 44px;
-      height: 42px;
-      background: var(--tile);
-      border-radius: 10px;
-      cursor: pointer;
-      text-align: center;
-      font-size: 1.3rem;
-      color: var(--good);
-      border: 2px solid var(--line);
-      user-select: none;
-      -webkit-user-select: none;
-      touch-action: manipulation;
-    }
-    .lg td.on { background: var(--card); border-color: var(--acc); }
-
-    /* ========== ACTION BUTTONS ROW ========== */
-    .acts {
+    /* Classify Items */
+    .c6-item {
       display: flex;
+      align-items: center;
+      justify-content: space-between;
       gap: 10px;
       flex-wrap: wrap;
-      margin: 16px 0;
-      align-items: center;
-    }
-
-    /* ========== ROBOT ASSISTANT ========== */
-    .bot {
-      display: flex;
-      gap: 12px;
-      align-items: flex-start;
-      margin-top: 12px;
-    }
-    .bot > span {
-      font-size: clamp(1.8rem, 6vw, 2.4rem);
-      animation: bob 2.4s ease-in-out infinite;
-      flex-shrink: 0;
-    }
-    .bot p {
-      margin: 0;
+      padding: 10px 14px;
+      border: 2px solid var(--line);
       background: var(--tile);
-      border-radius: 6px 20px 20px 20px;
-      padding: 0.6em 1em;
-      font-weight: 600;
-      font-size: clamp(0.9rem, 3vw, 1rem);
-      flex: 1;
+      border-radius: 16px;
+      margin: 8px 0;
     }
+    .c6-seg { display: flex; gap: 6px; }
+    .c6-seg button {
+      font: inherit;
+      font-weight: 700;
+      padding: 6px 14px;
+      border-radius: 10px;
+      border: 2px solid var(--line);
+      background: var(--card);
+      color: var(--ink);
+      cursor: pointer;
+      min-height: 38px;
+    }
+    .c6-seg button[aria-pressed="true"] { background: var(--acc); color: #fff; border-color: var(--acc); }
 
-    /* ========== STEP-BY-STEP SOLUTION ========== */
+    /* Logic Queue Grid */
+    ol.cl { padding-left: 1.4em; line-height: 1.65; max-width: 58ch; margin: 10px 0; font-size: clamp(0.95rem, 3vw, 1.08rem); }
+    .lg-wrapper { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+    .lg { border-collapse: separate; border-spacing: 4px; margin: 10px 0; min-width: 320px; }
+    .lg th { background: var(--tile); border-radius: 10px; padding: 7px 10px; text-align: left; white-space: nowrap; }
+    .lg td { width: 44px; height: 42px; background: var(--tile); border-radius: 10px; cursor: pointer; text-align: center; font-size: 1.3rem; color: var(--good); border: 2px solid var(--line); user-select: none; }
+    .lg td.on { background: var(--card); border-color: var(--acc); }
+
+    /* Action Row & Robot Assistant */
+    .acts { display: flex; gap: 10px; flex-wrap: wrap; margin: 16px 0; align-items: center; }
+    .bot { display: flex; gap: 12px; align-items: flex-start; margin-top: 12px; }
+    .bot > span { font-size: clamp(1.8rem, 6vw, 2.4rem); flex-shrink: 0; }
+    .bot p { margin: 0; background: var(--tile); border-radius: 6px 20px 20px 20px; padding: 0.65em 1em; font-weight: 600; flex: 1; }
+    .bot p.ok { border: 2px solid var(--good); color: var(--good); }
+    .bot p.bad { border: 2px solid var(--bad); color: var(--bad); }
+
+    /* Step-by-Step Solution Workflow */
     .sol {
       margin-top: 16px;
       border: 3px dashed var(--acc);
       border-radius: 20px;
       padding: clamp(12px, 3vw, 18px);
-      background: rgba(58,87,232,.03);
+      background: rgba(58, 87, 232, 0.04);
     }
     .sol h4 { margin: 0 0 10px; font-size: 1rem; }
-    .viz {
-      background: var(--tile);
-      border-radius: 14px;
-      padding: 12px;
-      text-align: center;
-      font-size: clamp(1.1rem, 4vw, 1.5rem);
-      margin-bottom: 10px;
-      overflow-x: auto;
-    }
-    .sol li { margin: 0.35em 0; opacity: 0.65; font-size: clamp(0.9rem, 3vw, 1rem); }
+    .viz { background: var(--tile); border-radius: 14px; padding: 12px; text-align: center; font-size: clamp(1.05rem, 4vw, 1.45rem); margin-bottom: 10px; overflow-x: auto; }
+    .sol ol { padding-left: 1.3em; }
+    .sol li { margin: 0.45em 0; opacity: 0.65; }
     .sol li.now { opacity: 1; font-weight: 700; }
-
-    /* ========== MISC ELEMENTS ========== */
-    .eq   { font-size: clamp(1.2rem, 4vw, 1.6rem); font-weight: 700; margin: 6px 0; }
-    .sqv  { width: clamp(130px, 35vw, 170px); height: clamp(130px, 35vw, 170px); }
-
-    .ln {
-      display: grid;
-      grid-template-columns: repeat(5, minmax(52px, 1fr));
-      gap: 5px;
-      overflow-x: auto;
-    }
-    .sl {
-      background: var(--card);
-      border: 2px dashed var(--line);
-      border-radius: 12px;
-      padding: 6px 2px;
-      font-size: clamp(1rem, 4vw, 1.4rem);
-      min-height: 76px;
-      text-align: center;
-    }
+    .eq { font-size: clamp(1.15rem, 4vw, 1.55rem); font-weight: 700; margin: 6px 0; }
+    .sqv { width: clamp(130px, 35vw, 170px); height: clamp(130px, 35vw, 170px); }
+    .ln { display: grid; grid-template-columns: repeat(5, minmax(52px, 1fr)); gap: 5px; overflow-x: auto; }
+    .sl { background: var(--card); border: 2px dashed var(--line); border-radius: 12px; padding: 6px 2px; font-size: clamp(1rem, 4vw, 1.35rem); min-height: 76px; text-align: center; }
     .sl.f { border: 2px solid var(--good); }
     .sl small, .sl b { display: block; font-size: 0.75rem; }
 
-    @media (max-width: 440px) {
-      .acts .btn { flex: 1 1 auto; }
-      .acts #chk { flex-basis: 100%; }
-      input.num { width: 72px; }
-      .lg { min-width: 100%; border-spacing: 3px; }
-      .lg th { padding: 6px 8px; }
-      .lg td { width: 38px; height: 38px; font-size: 1.15rem; }
+    .nav { display: flex; justify-content: space-between; margin-top: 16px; gap: 10px; }
+    .bar { height: 12px; background: var(--tile); border-radius: var(--radius-pill); overflow: hidden; margin: 5px 0 10px; }
+    .bar i { display: block; height: 100%; background: linear-gradient(90deg, var(--good), #3ddc97); border-radius: var(--radius-pill); transition: width 0.5s ease; }
+    .note-tag { font-size: 0.8rem; background: #fff3b0; color: #4b3b00; border-radius: 10px; padding: 4px 10px; display: inline-block; font-weight: 700; margin: 8px 0; }
+
+    /* Certificate Card */
+    .cert-box {
+      border: 4px double var(--acc);
+      border-radius: 22px;
+      padding: clamp(16px, 4vw, 28px);
+      background: linear-gradient(145deg, var(--card), var(--tile));
+      text-align: center;
+      margin: 12px 0;
     }
 
+    .cf { position: fixed; top: -30px; font-size: 26px; z-index: 999; pointer-events: none; animation: fall 1.8s ease-in forwards; }
+    @keyframes fall { to { transform: translate(var(--dx), 105vh) rotate(540deg); } }
+
+    @media (max-width: 440px) {
+      .acts .btn { flex: 1 1 auto; }
+      .acts #chk-btn { flex-basis: 100%; }
+      input.num { width: 74px; }
+      .lg td { width: 38px; height: 38px; font-size: 1.15rem; }
+    }
     @media (max-height: 520px) {
       .cover-overlay { padding: 10px 16px 12px; }
       .cover-actions { gap: 8px; padding-bottom: 4px; }
       .scroll-hint { display: none; }
       .btn.big { font-size: 1rem; padding: 0.55em 1.4em; }
     }
-
-    /* ========== NAV ROW ========== */
-    .nav {
-      display: flex;
-      justify-content: space-between;
-      margin-top: 16px;
-      gap: 10px;
+    @media print {
+      #cover-view, .canvas-fixed, #scroll-progress-bar, #load-indicator, .top-controls, .mode-tabs, .q-dots, .nav, .acts { display: none !important; }
+      body { background: #fff !important; color: #000 !important; }
+      .page { box-shadow: none !important; border: 1px solid #ccc !important; }
     }
-
-    /* ========== RESULT BARS ========== */
-    .bar {
-      height: 14px;
-      background: var(--tile);
-      border-radius: var(--radius-pill);
-      overflow: hidden;
-      margin: 5px 0 12px;
-    }
-    .bar i {
-      display: block;
-      height: 100%;
-      background: linear-gradient(90deg, var(--good), #3ddc97);
-      border-radius: var(--radius-pill);
-      transition: width 0.6s ease;
-    }
-
-    /* ========== CONFETTI ========== */
-    .cf {
-      position: fixed;
-      top: -30px;
-      font-size: 26px;
-      z-index: 999;
-      pointer-events: none;
-      animation: fall 1.8s ease-in forwards;
-    }
-    @keyframes fall {
-      to { transform: translate(var(--dx), 105vh) rotate(540deg); }
-    }
-
-    /* ========== LOADING INDICATOR ========== */
-    #load-indicator {
-      position: fixed;
-      top: calc(68px + env(safe-area-inset-top, 0px));
-      left: 50%;
-      transform: translateX(-50%);
-      z-index: 10;
-      background: var(--card);
-      border: 2px solid var(--line);
-      border-radius: var(--radius-pill);
-      padding: 0.35em 1.1em;
-      font-size: 0.82rem;
-      font-weight: 600;
-      color: var(--mut);
-      backdrop-filter: blur(8px);
-      transition: opacity 0.4s ease;
-      pointer-events: none;
-      white-space: nowrap;
-    }
-    #load-indicator.done { opacity: 0; }
-
-    /* ========== REDUCED MOTION ========== */
     @media (prefers-reduced-motion: reduce) {
-      *, *::before, *::after {
-        animation-duration: 0.001s !important;
-        animation-iteration-count: 1 !important;
-        transition-duration: 0.001s !important;
-      }
+      *, *::before, *::after { animation-duration: 0.001s !important; animation-iteration-count: 1 !important; transition-duration: 0.001s !important; }
     }
   </style>
 </head>
 <body>
 
-  <!-- Scroll progress indicator bar at top -->
   <div id="scroll-progress-bar"></div>
+  <div data-cursor><span data-cursor-label></span></div>
 
-  <!-- Full-screen animation canvas (always present) -->
-  <div class="canvas-fixed" id="canvas-fixed">
-    <canvas id="anim-canvas"></canvas>
-  </div>
+  <!-- Blurred Ambient Backdrop when E-Book is Open -->
+  <div class="canvas-fixed" id="canvas-fixed"></div>
 
-  <!-- Loading indicator -->
-  <div id="load-indicator">Loading animation… 0%</div>
+  <div id="load-indicator">Loading 3D frames… 0%</div>
 
-  <!-- SECTION 1: Cinematic Scroll Cover -->
-  <section id="cover-view">
-    <div class="cover-overlay" id="cover-overlay">
-      <div class="brand-pill">Brainwave's <b>Future Tech Minds 3</b></div>
-      <div class="cover-actions">
-        <div class="scroll-hint" id="scroll-hint-btn">↓ Scroll to explore</div>
-        <button class="btn big" id="open-book-btn">Open the book 📖</button>
-      </div>
+  <!-- TOP NAVIGATION -->
+  <header class="site-nav" id="site-nav">
+    <div class="nav-brand"><span>🧠</span> Brainwave's <b>Future Tech Minds</b></div>
+    <div class="nav-right">
       <div class="fitscalez-wrap" id="fitscalez-wrap">
         <div class="fitscalez-pop" id="fitscalez-pop" hidden>✨ Interactive AI Learning by <b>Fitscalez</b></div>
-        <button class="fitscalez-badge" id="fitscalez-btn" type="button" aria-label="Powered by Fitscalez">
+        <button class="fitscalez-badge" id="fitscalez-btn" type="button" data-magnetic="0.12" aria-label="Powered by Fitscalez">
           <span class="fitscalez-icon" aria-hidden="true">⚡</span>
           <span>Powered by <span class="fitscalez-brand">Fitscalez</span></span>
         </button>
       </div>
+      <button class="btn nav-hide-sm" id="nav-start-btn" data-magnetic="0.14">Start Learning →</button>
     </div>
-  </section>
+  </header>
 
-  <!-- SECTION 2: Interactive Question Book -->
-  <section id="book-section" hidden>
-    <div id="book">
-      <div class="top-bar">
-        <h2>Chapter 1: <span>Future Ready Thinking</span></h2>
-        <div class="top-controls">
-          <button class="ghost" id="rewatch-btn">🎬 Cover</button>
-          <span class="pill" id="stars">⭐ 0</span>
-          <button class="ghost" id="snd" aria-label="Toggle sound">🔊</button>
+  <!-- STAGE 1: COMPLETELY NEW CINEMATIC LANDING PAGE -->
+  <main id="cover-view">
+    <!-- 1. Editorial Hero with Mouse-Reactive Parallax -->
+    <section class="hero-section" data-mouse-parallax>
+      <div class="hero-copy">
+        <div class="hero-eyebrow" data-reveal="fade-up">✨ 500+ Schools • Classes 3–8 Interactive E-Book</div>
+        <h1 class="hero-title" data-motion-text="lines">
+          <span class="motion-line-mask"><span class="motion-line">Think Like a Coder.</span></span>
+          <span class="motion-line-mask"><span class="motion-line accent">Solve Like a Creator.</span></span>
+        </h1>
+        <p class="hero-sub" data-motion-text="words">
+          Read engaging visual lessons, check your answers in real time, and follow step-by-step animated solutions for every chapter.
+        </p>
+        <div class="hero-ctas" data-reveal="fade-up" data-reveal-delay="0.2">
+          <button class="btn big" id="open-book-btn" data-magnetic="0.16" data-cursor-label="Go">Start Learning →</button>
+          <button class="btn alt" id="scroll-hint-btn" data-magnetic="0.12">Explore 3D Story ↓</button>
         </div>
       </div>
 
-      <nav id="tabs" aria-label="Questions"></nav>
-      <article class="page" id="pg" aria-live="polite"></article>
-
-      <div class="nav">
-        <button class="btn alt" id="pv">‹ Back</button>
-        <button class="btn" id="nx">Next ›</button>
+      <div class="hero-stage" data-image-reveal data-mouse-depth="0.028">
+        <img src="/frames_webp/frame_000090.webp" alt="Future Tech Minds Robot and Student">
       </div>
-    </div>
+    </section>
+
+    <!-- 2. Pinned 3D Scroll Story Scene (359-Frame WebP Scrub) -->
+    <section class="story-scene" id="story-scene" data-story-scene>
+      <div class="story-grid">
+        <div class="canvas-stage" data-reveal="scale">
+          <canvas id="anim-canvas"></canvas>
+        </div>
+        <div class="story-beats">
+          <article class="story-beat" data-beat="0">
+            <span class="beat-num">01 / EXPLAIN &amp; READ</span>
+            <h3>Visual Lessons Built for Kids</h3>
+            <p>Every chapter opens with clear, bite-sized concepts and built-in voice narration so students learn independently at their own pace.</p>
+          </article>
+          <article class="story-beat" data-beat="1">
+            <span class="beat-num">02 / CHECK &amp; MATCH</span>
+            <h3>Instant Interactive Practice</h3>
+            <p>Students enter numbers, tap classifications, order algorithms, and solve logic grids—getting immediate feedback and star rewards.</p>
+          </article>
+          <article class="story-beat" data-beat="2">
+            <span class="beat-num">03 / STEP-BY-STEP WORKFLOW</span>
+            <h3>Guided Solution Breakdown</h3>
+            <p>Never get stuck. Every question includes an animated step-by-step visual walkthrough showing exactly how to reach the answer.</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <!-- 3. Industry-Scale Features Grid -->
+    <section class="features-section">
+      <div class="section-head" data-reveal="fade-up">
+        <h2>Built for 500+ Schools</h2>
+        <p>Fast, offline-ready, and modular across Classes 3 to 8—ready for classroom tablets, Chromebooks, and home study.</p>
+      </div>
+      <div class="hub-grid" data-reveal-group>
+        <article class="hub-card" data-reveal-item>
+          <span class="big">⚡</span>
+          <h3>100% Offline Ready</h3>
+          <small>Zero external dependencies. Caches all 359 frames and lessons locally via Service Worker.</small>
+          <span class="hub-tag ok">PWA Enabled</span>
+        </article>
+        <article class="hub-card" data-reveal-item>
+          <span class="big">📚</span>
+          <h3>Classes 3 to 8 Flow</h3>
+          <small>Landing → Class Picker → Chapter Directory → Explain, Practice &amp; Step-by-Step Solutions.</small>
+          <span class="hub-tag ok">Modular JSON</span>
+        </article>
+        <article class="hub-card" data-reveal-item>
+          <span class="big">🏆</span>
+          <h3>School Certificates</h3>
+          <small>Skill mastery analytics and printable completion reports with student names.</small>
+          <span class="hub-tag ok">Teacher Ready</span>
+        </article>
+      </div>
+    </section>
+
+    <!-- 4. Final CTA Banner -->
+    <section class="features-section" style="padding-top:0">
+      <div class="cta-banner" data-reveal="scale">
+        <h2>Ready to Open Your E-Book?</h2>
+        <p>Pick your class, explore chapters, and earn stars across interactive computational thinking challenges.</p>
+        <button class="btn big" id="bottom-start-btn" data-magnetic="0.15">Launch Interactive E-Book →</button>
+      </div>
+    </section>
+
+    <footer class="site-footer">
+      <div>Brainwave's <b>Future Tech Minds</b> • Interactive Computational Thinking Platform</div>
+      <div>Powered by <b>Fitscalez</b></div>
+    </footer>
+  </main>
+
+  <!-- STAGES 2–4: CLASS PICKER, CHAPTER DIRECTORY & UNIFIED E-BOOK -->
+  <section id="app-section" hidden>
+    <div class="shell" id="app-shell"></div>
   </section>
+
+  <!-- Local GSAP, ScrollTrigger & Lenis (100% offline) -->
+  <script src="/vendor/lenis.min.js"></script>
+  <script src="/vendor/gsap.min.js"></script>
+  <script src="/vendor/ScrollTrigger.min.js"></script>
 
   <script>
   (function () {
     'use strict';
 
-    /* ============================================================
-       1. CONFIGURATION
-    ============================================================ */
-    const TOTAL_FRAMES  = 359;
-    // Try WebP first (3× smaller), fall back to original JPEG
-    const supportsWebP  = (function () {
-      try {
-        const c = document.createElement('canvas');
-        return c.toDataURL('image/webp').startsWith('data:image/webp');
-      } catch (e) { return false; }
-    })();
-    const FRAME_DIR     = supportsWebP ? 'frames_webp' : 'frames';
-    const FRAME_EXT     = supportsWebP ? '.webp' : '.jpg';
+    const reduceMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const isCoarsePointer = window.matchMedia && window.matchMedia('(pointer: coarse)').matches;
+    const hasGSAP = typeof window.gsap !== 'undefined';
 
     /* ============================================================
-       2. DOM REFS
+       1. GSAP + LENIS SMOOTH SCROLL SYSTEM
     ============================================================ */
-    const canvas         = document.getElementById('anim-canvas');
-    const ctx            = canvas.getContext('2d', { alpha: false });
-    const coverView      = document.getElementById('cover-view');
-    const coverOverlay   = document.getElementById('cover-overlay');
-    const bookSection    = document.getElementById('book-section');
-    const canvasFixed    = document.getElementById('canvas-fixed');
-    const openBookBtn    = document.getElementById('open-book-btn');
-    const rewatchBtn     = document.getElementById('rewatch-btn');
-    const scrollHintBtn  = document.getElementById('scroll-hint-btn');
-    const progressBar    = document.getElementById('scroll-progress-bar');
-    const loadIndicator  = document.getElementById('load-indicator');
-
-    /* ============================================================
-       3. STATE
-    ============================================================ */
-    const images        = new Array(TOTAL_FRAMES);
-    let loadedCount     = 0;
-    let targetProgress  = 0;
-    let currentProgress = 0;
-    let lastDrawnIdx    = -1;
-    let isBookOpen      = false;
-    let rafPending      = false;
-    let dpr             = 1;
-
-    /* ============================================================
-       4. FRAME PATH
-    ============================================================ */
-    function frameSrc(index) {
-      return FRAME_DIR + '/frame_' + String(index + 1).padStart(6, '0') + FRAME_EXT;
+    let lenis = null;
+    if (hasGSAP && typeof window.ScrollTrigger !== 'undefined') {
+      gsap.registerPlugin(ScrollTrigger);
+      gsap.defaults({ ease: 'power3.out', duration: 0.7 });
+      if (!reduceMotion && typeof window.Lenis !== 'undefined') {
+        lenis = new Lenis({ lerp: 0.09, smoothWheel: true, wheelMultiplier: 0.95 });
+        lenis.on('scroll', ScrollTrigger.update);
+        gsap.ticker.add(t => lenis.raf(t * 1000));
+        gsap.ticker.lagSmoothing(0);
+      }
     }
 
     /* ============================================================
-       5. CANVAS RESIZE
+       2. 359-FRAME WEBP SCROLL CANVAS
     ============================================================ */
+    const TOTAL_FRAMES = 359;
+    const supportsWebP = (() => {
+      try { return document.createElement('canvas').toDataURL('image/webp').startsWith('data:image/webp'); }
+      catch (e) { return false; }
+    })();
+    const FRAME_DIR = supportsWebP ? 'frames_webp' : 'frames';
+    const FRAME_EXT = supportsWebP ? '.webp' : '.jpg';
+
+    const canvas = document.getElementById('anim-canvas');
+    const ctx = canvas.getContext('2d', { alpha: false });
+    const coverView = document.getElementById('cover-view');
+    const siteNav = document.getElementById('site-nav');
+    const canvasFixed = document.getElementById('canvas-fixed');
+    const appSection = document.getElementById('app-section');
+    const appShell = document.getElementById('app-shell');
+    const progressBar = document.getElementById('scroll-progress-bar');
+    const loadIndicator = document.getElementById('load-indicator');
+    const openBookBtn = document.getElementById('open-book-btn');
+    const scrollHintBtn = document.getElementById('scroll-hint-btn');
+
+    const images = new Array(TOTAL_FRAMES);
+    let loadedCount = 0;
+    let targetProgress = 0;
+    let currentProgress = 0;
+    let lastDrawnIdx = -1;
+    let isBookOpen = false;
+    let rafPending = false;
+    let dpr = 1;
+
+    function frameSrc(idx) {
+      return FRAME_DIR + '/frame_' + String(idx + 1).padStart(6, '0') + FRAME_EXT;
+    }
+
     function resize() {
       dpr = Math.min(window.devicePixelRatio || 1, 2);
-      canvas.width  = Math.round(window.innerWidth  * dpr);
-      canvas.height = Math.round(window.innerHeight * dpr);
+      const box = canvas.parentElement;
+      const w = (box && box.clientWidth) ? box.clientWidth : window.innerWidth;
+      const h = (box && box.clientHeight) ? box.clientHeight : Math.round(w * 9 / 16);
+      canvas.width = Math.round(w * dpr);
+      canvas.height = Math.round(h * dpr);
       ctx.imageSmoothingEnabled = true;
       ctx.imageSmoothingQuality = 'high';
-      lastDrawnIdx = -1; // force redraw after resize
+      lastDrawnIdx = -1;
       scheduleRender();
     }
 
-    /* ============================================================
-       6. DRAW FRAME (cover-fit on landscape, smart-fit on portrait mobile)
-    ============================================================ */
     function drawImage(img) {
       if (!img || img.naturalWidth === 0) return;
       const cw = canvas.width, ch = canvas.height;
       const nw = img.naturalWidth, nh = img.naturalHeight;
       const imgR = nw / nh, canR = cw / ch;
       let dw, dh, dx, dy;
-      if (canR < 0.85) {
-        // Portrait phone: fit full width so robot, girl & "3" stay visible
-        const dark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
-        ctx.fillStyle = dark ? '#141a3a' : '#f7f1e8';
-        ctx.fillRect(0, 0, cw, ch);
-        dw = cw;
-        dh = cw / imgR;
-        dx = 0;
-        dy = (ch - dh) / 2;
-      } else if (canR > imgR) {
+      if (canR > imgR) {
         dw = cw; dh = cw / imgR; dx = 0; dy = (ch - dh) / 2;
       } else {
         dh = ch; dw = ch * imgR; dx = (cw - dw) / 2; dy = 0;
       }
       ctx.drawImage(img, dx, dy, dw, dh);
-      positionFitscalezBadge(dx, dy, dw, dh);
-    }
-
-    function positionFitscalezBadge(dx, dy, dw, dh) {
-      const wrap = document.getElementById('fitscalez-wrap');
-      if (!wrap) return;
-      // Exact spot right below the yellow "3" (over the corner sparkle)
-      const targetX = (dx + dw * 0.90) / dpr;
-      const targetY = (dy + dh * 0.83) / dpr;
-      const vw = window.innerWidth;
-      const vh = window.innerHeight;
-      const bw = wrap.offsetWidth || 180;
-      const bh = wrap.offsetHeight || 42;
-      const clampedX = Math.max(bw / 2 + 10, Math.min(vw - bw / 2 - 10, targetX));
-      const clampedY = Math.max(bh / 2 + 10, Math.min(vh - bh / 2 - 12, targetY));
-      wrap.style.left = clampedX + 'px';
-      wrap.style.top  = clampedY + 'px';
     }
 
     function bestLoadedImage(targetIdx) {
-      // Check exact frame first
       const img = images[targetIdx];
       if (img && img.complete && img.naturalWidth > 0) return { img, idx: targetIdx };
-      // Spiral outward to find nearest loaded frame
       for (let off = 1; off < TOTAL_FRAMES; off++) {
         const p = targetIdx - off;
-        if (p >= 0 && images[p] && images[p].complete && images[p].naturalWidth > 0)
-          return { img: images[p], idx: p };
+        if (p >= 0 && images[p] && images[p].complete && images[p].naturalWidth > 0) return { img: images[p], idx: p };
         const n = targetIdx + off;
-        if (n < TOTAL_FRAMES && images[n] && images[n].complete && images[n].naturalWidth > 0)
-          return { img: images[n], idx: n };
+        if (n < TOTAL_FRAMES && images[n] && images[n].complete && images[n].naturalWidth > 0) return { img: images[n], idx: n };
       }
       return null;
     }
 
-    /* ============================================================
-       7. RENDER (called inside rAF)
-    ============================================================ */
-    function render() {
-      const targetIdx = Math.min(TOTAL_FRAMES - 1, Math.max(0,
-        Math.round(currentProgress * (TOTAL_FRAMES - 1))
-      ));
+    function renderCanvas() {
+      const targetIdx = Math.min(TOTAL_FRAMES - 1, Math.max(0, Math.round(currentProgress * (TOTAL_FRAMES - 1))));
       const best = bestLoadedImage(targetIdx);
       if (!best) return;
       if (best.idx !== lastDrawnIdx) {
@@ -1064,78 +1231,172 @@
       }
     }
 
-    /* ============================================================
-       8. ANIMATION LOOP — smooth lerp with rAF batching
-    ============================================================ */
     function scheduleRender() {
       if (!rafPending) {
         rafPending = true;
-        requestAnimationFrame(loop);
+        requestAnimationFrame(loopCanvas);
       }
     }
 
-    function loop(ts) {
+    function loopCanvas() {
       rafPending = false;
       if (!isBookOpen) {
         const diff = targetProgress - currentProgress;
         if (Math.abs(diff) > 0.0002) {
-          // Adaptive lerp: faster when far away, smoother near target
-          const speed = Math.abs(diff) > 0.05 ? 0.3 : 0.18;
-          currentProgress += diff * speed;
+          currentProgress += diff * (Math.abs(diff) > 0.05 ? 0.3 : 0.18);
           scheduleRender();
         } else {
           currentProgress = targetProgress;
         }
-        render();
+        renderCanvas();
       }
     }
 
-    /* ============================================================
-       9. SCROLL HANDLER
-    ============================================================ */
-    let scrollRAF = null;
-    function onScroll() {
-      if (isBookOpen) return;
-      if (scrollRAF) return;
-      scrollRAF = requestAnimationFrame(() => {
-        scrollRAF = null;
-        const st = window.scrollY || 0;
-        const maxS = coverView.offsetHeight - window.innerHeight;
-        targetProgress = maxS > 0 ? Math.min(1, Math.max(0, st / maxS)) : 0;
-        progressBar.style.width = (targetProgress * 100).toFixed(2) + '%';
-        scheduleRender();
+    function splitWords(element) {
+      if (element.dataset.motionSplit === 'true') return;
+      const text = element.textContent || '';
+      const parts = text.split(/(\s+)/);
+      element.textContent = '';
+      element.setAttribute('aria-label', text.trim());
+      parts.forEach(part => {
+        if (!part.trim()) { element.appendChild(document.createTextNode(part)); return; }
+        const mask = document.createElement('span');
+        const word = document.createElement('span');
+        mask.className = 'motion-word-mask';
+        mask.setAttribute('aria-hidden', 'true');
+        word.className = 'motion-word';
+        word.textContent = part;
+        mask.appendChild(word);
+        element.appendChild(mask);
       });
+      element.dataset.motionSplit = 'true';
     }
 
-    /* ============================================================
-       10. IMAGE PRELOADING — priority queue strategy
-         1. Frame 1 (immediate first paint)
-         2. Every 15th frame (skeleton for quick jumps)
-         3. All remaining in sequential order
-    ============================================================ */
-    function initImages() {
-      const priorityQueue = [];
+    function initCinematicLanding() {
+      if (!hasGSAP || reduceMotion) return;
 
-      // Priority 1: First frame
-      priorityQueue.push(0);
-      // Priority 2: Keyframes every 15
-      for (let i = 15; i < TOTAL_FRAMES; i += 15) priorityQueue.push(i);
-      // Priority 3: Rest
-      for (let i = 1; i < TOTAL_FRAMES; i++) {
-        if (i % 15 !== 0) priorityQueue.push(i);
+      // 1. Hero Text Reveals (lines + words)
+      gsap.utils.toArray('[data-motion-text="lines"]').forEach(el => {
+        const lines = el.querySelectorAll('.motion-line');
+        if (!lines.length) return;
+        gsap.fromTo(lines,
+          { yPercent: 105, autoAlpha: 0, filter: 'blur(8px)' },
+          { yPercent: 0, autoAlpha: 1, filter: 'blur(0px)', duration: 1, ease: 'power4.out', stagger: 0.12 }
+        );
+      });
+
+      gsap.utils.toArray('[data-motion-text="words"]').forEach(el => {
+        splitWords(el);
+        const words = el.querySelectorAll('.motion-word');
+        gsap.fromTo(words,
+          { yPercent: 110, autoAlpha: 0, filter: 'blur(6px)' },
+          { yPercent: 0, autoAlpha: 1, filter: 'blur(0px)', duration: 0.85, ease: 'power4.out', stagger: 0.035, delay: 0.18 }
+        );
+      });
+
+      // 2. Clip Image Reveal on Hero Stage
+      gsap.utils.toArray('[data-image-reveal]').forEach(fig => {
+        const img = fig.querySelector('img');
+        const tl = gsap.timeline();
+        tl.fromTo(fig, { clipPath: 'inset(0 0 100% 0)' }, { clipPath: 'inset(0 0 0% 0)', duration: 1.05, ease: 'power4.out' });
+        if (img) tl.fromTo(img, { scale: 1.08, autoAlpha: 0.8 }, { scale: 1, autoAlpha: 1, duration: 1.15, ease: 'power4.out' }, 0);
+      });
+
+      // 3. Scroll Reveals
+      const presets = {
+        'fade-up': { from: { y: 30, autoAlpha: 0 }, to: { y: 0, autoAlpha: 1 } },
+        'scale':   { from: { scale: 0.96, autoAlpha: 0 }, to: { scale: 1, autoAlpha: 1 } }
+      };
+      gsap.utils.toArray('[data-reveal]:not([data-reveal-item])').forEach(el => {
+        const p = presets[el.dataset.reveal] || presets['fade-up'];
+        gsap.fromTo(el, p.from, {
+          ...p.to, duration: 0.85, ease: 'power4.out', delay: Number(el.dataset.revealDelay || 0),
+          scrollTrigger: { trigger: el, start: 'top 86%', once: true }
+        });
+      });
+      gsap.utils.toArray('[data-reveal-group]').forEach(group => {
+        const items = group.querySelectorAll('[data-reveal-item]');
+        gsap.fromTo(items,
+          { y: 32, autoAlpha: 0, filter: 'blur(6px)' },
+          { y: 0, autoAlpha: 1, filter: 'blur(0px)', duration: 0.9, ease: 'power4.out', stagger: 0.08,
+            scrollTrigger: { trigger: group, start: 'top 84%', once: true } }
+        );
+      });
+
+      // 4. Pinned 3D Scroll Story Scene (359 frames + 3 synchronized beats)
+      const storyScene = document.getElementById('story-scene');
+      const beats = gsap.utils.toArray('.story-beat');
+      if (storyScene && typeof window.ScrollTrigger !== 'undefined') {
+        beats.forEach((b, i) => gsap.set(b, { autoAlpha: i === 0 ? 1 : 0, y: i === 0 ? 0 : 28 }));
+        ScrollTrigger.create({
+          trigger: storyScene,
+          start: 'top top',
+          end: '+=240%',
+          pin: true,
+          anticipatePin: 1,
+          scrub: 0.9,
+          onUpdate: self => {
+            if (isBookOpen) return;
+            targetProgress = self.progress;
+            progressBar.style.width = (self.progress * 100).toFixed(2) + '%';
+            scheduleRender();
+            const activeBeat = self.progress < 0.34 ? 0 : (self.progress < 0.68 ? 1 : 2);
+            beats.forEach((b, idx) => {
+              if (idx === activeBeat) gsap.to(b, { autoAlpha: 1, y: 0, duration: 0.45, ease: 'power3.out', overwrite: 'auto' });
+              else gsap.to(b, { autoAlpha: 0, y: idx < activeBeat ? -24 : 24, duration: 0.35, ease: 'power2.out', overwrite: 'auto' });
+            });
+          }
+        });
       }
 
-      const CONCURRENCY = 8;
-      let head = 0;
-      let inFlight = 0;
+      // 5. Mouse-Reactive Parallax & Custom Atmospheric Cursor (desktop only)
+      if (!isCoarsePointer) {
+        gsap.utils.toArray('[data-mouse-parallax]').forEach(sec => {
+          const layers = sec.querySelectorAll('[data-mouse-depth]');
+          const setters = [...layers].map(layer => ({
+            depth: Number(layer.dataset.mouseDepth || 0.03),
+            xTo: gsap.quickTo(layer, 'x', { duration: 0.75, ease: 'power3.out' }),
+            yTo: gsap.quickTo(layer, 'y', { duration: 0.75, ease: 'power3.out' })
+          }));
+          sec.addEventListener('pointermove', e => {
+            const r = sec.getBoundingClientRect();
+            const x = e.clientX - r.left - r.width / 2;
+            const y = e.clientY - r.top - r.height / 2;
+            setters.forEach(s => { s.xTo(x * s.depth); s.yTo(y * s.depth); });
+          });
+          sec.addEventListener('pointerleave', () => setters.forEach(s => { s.xTo(0); s.yTo(0); }));
+        });
 
-      function loadNext() {
-        while (inFlight < CONCURRENCY && head < priorityQueue.length) {
-          const idx = priorityQueue[head++];
-          if (images[idx] && images[idx].complete && images[idx].naturalWidth > 0) {
-            loadNext();
-            continue;
-          }
+        const cursor = document.querySelector('[data-cursor]');
+        if (cursor) {
+          const cLabel = cursor.querySelector('[data-cursor-label]');
+          const xTo = gsap.quickTo(cursor, 'x', { duration: 0.32, ease: 'power3.out' });
+          const yTo = gsap.quickTo(cursor, 'y', { duration: 0.32, ease: 'power3.out' });
+          document.addEventListener('pointermove', e => { xTo(e.clientX); yTo(e.clientY); });
+          document.querySelectorAll('[data-cursor-label]').forEach(target => {
+            if (cursor.contains(target)) return;
+            target.addEventListener('pointerenter', () => {
+              if (cLabel) cLabel.textContent = target.dataset.cursorLabel || '';
+              gsap.to(cursor, { scale: 2.1, duration: 0.3, ease: 'power3.out' });
+            });
+            target.addEventListener('pointerleave', () => {
+              if (cLabel) cLabel.textContent = '';
+              gsap.to(cursor, { scale: 1, duration: 0.3, ease: 'power3.out' });
+            });
+          });
+        }
+      }
+      if (typeof window.ScrollTrigger !== 'undefined') ScrollTrigger.refresh();
+    }
+
+    function initImages() {
+      const queue = [0];
+      for (let i = 15; i < TOTAL_FRAMES; i += 15) queue.push(i);
+      for (let i = 1; i < TOTAL_FRAMES; i++) if (i % 15 !== 0) queue.push(i);
+      let head = 0, inFlight = 0;
+      function next() {
+        while (inFlight < 8 && head < queue.length) {
+          const idx = queue[head++];
           inFlight++;
           const img = new Image();
           img.decoding = 'async';
@@ -1144,98 +1405,74 @@
             images[idx] = img;
             loadedCount++;
             inFlight--;
-            const pct = Math.round(loadedCount / TOTAL_FRAMES * 100);
-            if (pct < 100) {
-              loadIndicator.textContent = 'Loading animation… ' + pct + '%';
-            } else {
+            const pct = Math.round((loadedCount / TOTAL_FRAMES) * 100);
+            if (pct < 100) loadIndicator.textContent = 'Loading animation… ' + pct + '%';
+            else {
               loadIndicator.textContent = 'Offline ready ✓';
               setTimeout(() => loadIndicator.classList.add('done'), 2000);
             }
-            const curIdx = Math.round(currentProgress * (TOTAL_FRAMES - 1));
-            if (Math.abs(curIdx - idx) <= 3) scheduleRender();
-            loadNext();
+            if (Math.abs(Math.round(currentProgress * (TOTAL_FRAMES - 1)) - idx) <= 3) scheduleRender();
+            next();
           };
-          img.onerror = function () {
-            inFlight--;
-            loadedCount++;
-            loadNext();
-          };
+          img.onerror = function () { inFlight--; loadedCount++; next(); };
           images[idx] = img;
         }
       }
-
-      loadNext();
+      next();
     }
 
     /* ============================================================
-       11. OPEN / CLOSE BOOK
+       3. GSAP MAGNETIC + 21st.dev 3D TILT CARDS
     ============================================================ */
-    function openBook() {
-      isBookOpen = true;
-      coverView.hidden = true;
-      coverOverlay.classList.add('hide');
-      bookSection.hidden = false;
-      canvasFixed.classList.add('blurred');
-      progressBar.style.opacity = '0';
-      window.scrollTo(0, 0);
-      tone(660, 0.15);
-      show(0);
+    function initMagnetic(root = document) {
+      if (!hasGSAP || reduceMotion || isCoarsePointer) return;
+      root.querySelectorAll('[data-magnetic]').forEach(el => {
+        if (el.dataset.magBound) return;
+        el.dataset.magBound = '1';
+        const s = Number(el.dataset.magnetic || 0.15);
+        const xTo = gsap.quickTo(el, 'x', { duration: 0.4, ease: 'power3.out' });
+        const yTo = gsap.quickTo(el, 'y', { duration: 0.4, ease: 'power3.out' });
+        el.addEventListener('pointermove', e => {
+          const r = el.getBoundingClientRect();
+          xTo((e.clientX - r.left - r.width / 2) * s);
+          yTo((e.clientY - r.top - r.height / 2) * s);
+        });
+        el.addEventListener('pointerleave', () => { xTo(0); yTo(0); });
+      });
     }
 
-    function closeBook() {
-      isBookOpen = false;
-      bookSection.hidden = true;
-      coverView.hidden = false;
-      coverOverlay.classList.remove('hide');
-      canvasFixed.classList.remove('blurred');
-      progressBar.style.opacity = '1';
-      window.scrollTo(0, 0);
-      lastDrawnIdx = -1;
-      scheduleRender();
+    function initTiltCards(root = document) {
+      if (!hasGSAP || reduceMotion || isCoarsePointer) return;
+      root.querySelectorAll('.hub-card:not([disabled])').forEach(card => {
+        const rxTo = gsap.quickTo(card, 'rotationX', { duration: 0.4, ease: 'power3.out' });
+        const ryTo = gsap.quickTo(card, 'rotationY', { duration: 0.4, ease: 'power3.out' });
+        const yTo  = gsap.quickTo(card, 'y', { duration: 0.4, ease: 'power3.out' });
+        card.addEventListener('pointermove', e => {
+          const r = card.getBoundingClientRect();
+          const px = (e.clientX - r.left) / r.width;
+          const py = (e.clientY - r.top) / r.height;
+          card.style.setProperty('--mx', (px * 100).toFixed(1) + '%');
+          card.style.setProperty('--my', (py * 100).toFixed(1) + '%');
+          rxTo((0.5 - py) * 7);
+          ryTo((px - 0.5) * 9);
+          yTo(-5);
+        });
+        card.addEventListener('pointerleave', () => { rxTo(0); ryTo(0); yTo(0); });
+      });
     }
 
-    openBookBtn.onclick  = openBook;
-    rewatchBtn.onclick   = closeBook;
-    scrollHintBtn.onclick = () => window.scrollBy({ top: window.innerHeight * 0.85, behavior: 'smooth' });
-
-    const fitscalezBtn = document.getElementById('fitscalez-btn');
-    const fitscalezPop = document.getElementById('fitscalez-pop');
-    let fzTimer = null;
-    if (fitscalezBtn && fitscalezPop) {
-      fitscalezBtn.onclick = () => {
-        [523, 659, 784].forEach((f, i) => tone(f, 0.12, i * 0.06));
-        pop();
-        fitscalezPop.hidden = !fitscalezPop.hidden;
-        clearTimeout(fzTimer);
-        if (!fitscalezPop.hidden) {
-          fzTimer = setTimeout(() => { fitscalezPop.hidden = true; }, 3500);
-        }
-      };
+    function animateCardsIn(selector) {
+      if (!hasGSAP || reduceMotion) return;
+      const items = appShell.querySelectorAll(selector);
+      if (!items.length) return;
+      gsap.fromTo(items,
+        { y: 24, autoAlpha: 0, scale: 0.97 },
+        { y: 0, autoAlpha: 1, scale: 1, duration: 0.55, stagger: 0.055, ease: 'power3.out', clearProps: 'transform' }
+      );
     }
 
     /* ============================================================
-       12. EVENT LISTENERS
-    ============================================================ */
-    // Debounced resize
-    let resizeTimer;
-    window.addEventListener('resize', () => {
-      clearTimeout(resizeTimer);
-      resizeTimer = setTimeout(resize, 80);
-    }, { passive: true });
-
-    window.addEventListener('scroll',    onScroll, { passive: true });
-    window.addEventListener('touchmove', onScroll, { passive: true });
-
-    /* ============================================================
-       13. BOOTSTRAP
-    ============================================================ */
-    resize();
-    initImages();
-    onScroll();
-    scheduleRender();
-
-    /* ============================================================
-       14. AUDIO (Web Audio API)
+       4. AUDIO & CONFETTI
     ============================================================ */
     let AC = null, snd = 1;
     function tone(f, d = 0.15, w = 0) {
@@ -1254,292 +1491,625 @@
     const oops = () => tone(200, 0.3);
 
     function pop() {
-      for (let i = 0; i < 28; i++) {
+      if (reduceMotion) return;
+      for (let i = 0; i < 24; i++) {
         const s = document.createElement('span');
         s.className = 'cf';
-        s.textContent = ['⭐','🎉','✨','🎈'][i % 4];
-        s.style.cssText = `left:${Math.random()*100}vw;--dx:${(Math.random()-.5)*220}px;animation-delay:${Math.random()*.3}s`;
+        s.textContent = ['⭐', '🎉', '✨', '🎈'][i % 4];
+        s.style.cssText = `left:${Math.random() * 100}vw;--dx:${(Math.random() - 0.5) * 200}px;animation-delay:${Math.random() * 0.25}s`;
         document.body.append(s);
-        setTimeout(() => s.remove(), 2300);
+        setTimeout(() => s.remove(), 2200);
       }
     }
 
+    function speakText(txt) {
+      if (!window.speechSynthesis) return;
+      window.speechSynthesis.cancel();
+      const plain = txt.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim();
+      const u = new SpeechSynthesisUtterance(plain);
+      u.rate = 0.92;
+      window.speechSynthesis.speak(u);
+    }
+
     /* ============================================================
-       15. QUESTION BANK
+       5. CURRICULUM LOADER + PERSISTENCE
     ============================================================ */
-    const N = ['Alisha', 'Anika', 'Zoya', 'Chirag', 'Ellie'];
+    const classCache = {};
+    let progress = {};
+    let studentName = '';
+    try { progress = JSON.parse(localStorage.getItem('ftm_progress_v2') || '{}'); } catch (e) {}
+    try { studentName = localStorage.getItem('ftm_student') || ''; } catch (e) {}
 
-    const tiles = (em, nm, hl, showName) =>
-      `<div class="ops${hl == null ? '' : ' st'}">` +
-      em.map((e, i) =>
-        `<button class="opt${hl == null ? '' : i === hl ? ' hl' : ' dim'}" data-i="${i}">` +
-        `<span class="em">${e}</span><span class="lt">${'ABCD'[i]}</span>` +
-        (showName ? `<small>${nm[i]}</small>` : '') +
-        `</button>`
-      ).join('') + '</div>';
+    function saveProgress() {
+      try { localStorage.setItem('ftm_progress_v2', JSON.stringify(progress)); } catch (e) {}
+    }
+    function qKey(cls, ch, qi) { return `c${cls}_ch${ch}_q${qi}`; }
+    function totalStars() {
+      return Object.values(progress).reduce((sum, entry) => sum + (entry.stars || 0), 0);
+    }
+    function classStars(cls) {
+      return Object.entries(progress)
+        .filter(([k]) => k.startsWith(`c${cls}_`))
+        .reduce((sum, [, v]) => sum + (v.stars || 0), 0);
+    }
+    function chapterDoneCount(cls, chId, qLen) {
+      let c = 0;
+      for (let i = 0; i < qLen; i++) if (progress[qKey(cls, chId, i)]?.done) c++;
+      return c;
+    }
 
-    const mc = (n, t, em, nm, a, why) => ({
-      n, skill: 'Classification', t, type: 'mcq', key: [a],
-      render: () => tiles(em, nm),
-      hints: ['Say the name of each picture out loud.', 'Three pictures belong to the same group. What do they do?'],
-      steps: [
-        { t: 'Name each picture.', v: tiles(em, nm, -1, 1).replace(/hl|dim/g, '') },
-        { t: why, v: tiles(em, nm, a, 1) }
-      ]
-    });
+    async function loadClassData(cls) {
+      if (classCache[cls]) return classCache[cls];
+      const res = await fetch(`/data/class-${cls}.json`);
+      if (!res.ok) throw new Error(`Failed to load class-${cls}.json`);
+      classCache[cls] = await res.json();
+      return classCache[cls];
+    }
 
-    const sq = k => {
+    /* ============================================================
+       6. UNIFIED 4-STAGE E-BOOK ENGINE
+    ============================================================ */
+    const state = {
+      screen: 'cover', // cover | classes | chapters | book
+      cls: 3,
+      chIdx: 0,
+      tab: 'learn',    // learn | practice | summary
+      qi: 0,
+      qState: {}
+    };
+
+    function topBarHTML(titleHTML, backTarget, backLabel) {
+      return `<div class="top-bar">
+        <h2>${titleHTML}</h2>
+        <div class="top-controls">
+          ${backTarget ? `<button class="ghost" data-nav="${backTarget}">${backLabel}</button>` : ''}
+          <button class="ghost" data-nav="cover">🎬 Cover</button>
+          <span class="pill" id="stars-pill">⭐ ${totalStars()}</span>
+          <button class="ghost" data-nav="sound" aria-label="Toggle sound">${snd ? '🔊' : '🔇'}</button>
+        </div>
+      </div>`;
+    }
+
+    function syncScrollLayout(scrollTopImmediate) {
+      if (lenis) {
+        if (scrollTopImmediate) lenis.scrollTo(0, { immediate: true });
+        requestAnimationFrame(() => lenis.resize());
+      } else if (scrollTopImmediate) {
+        window.scrollTo(0, 0);
+      }
+    }
+
+    function openBook() {
+      isBookOpen = true;
+      coverView.hidden = true;
+      if (siteNav) siteNav.classList.add('hide');
+      appSection.hidden = false;
+      canvasFixed.classList.add('blurred');
+      progressBar.style.opacity = '0';
+      tone(660, 0.14);
+      renderClasses();
+      syncScrollLayout(true);
+    }
+
+    function closeBook() {
+      isBookOpen = false;
+      if (window.speechSynthesis) window.speechSynthesis.cancel();
+      appSection.hidden = true;
+      coverView.hidden = false;
+      if (siteNav) siteNav.classList.remove('hide');
+      canvasFixed.classList.remove('blurred');
+      progressBar.style.opacity = '1';
+      lastDrawnIdx = -1;
+      resize();
+      if (hasGSAP && typeof window.ScrollTrigger !== 'undefined') ScrollTrigger.refresh();
+      syncScrollLayout(true);
+    }
+
+    function renderClasses() {
+      state.screen = 'classes';
+      const classes = [
+        { id: 3, ready: true,  desc: '1 Chapter • 6 Puzzles' },
+        { id: 4, ready: false, desc: 'Curriculum coming soon' },
+        { id: 5, ready: false, desc: 'Curriculum coming soon' },
+        { id: 6, ready: true,  desc: '10 Chapters • 9 Demo Puzzles' },
+        { id: 7, ready: false, desc: 'Curriculum coming soon' },
+        { id: 8, ready: false, desc: 'Curriculum coming soon' }
+      ];
+      const cards = classes.map(c => {
+        const stars = classStars(c.id);
+        return `<button class="hub-card" ${c.ready ? `data-nav="chapters" data-cls="${c.id}"` : 'disabled'}>
+          <span class="big">${c.ready ? '📘' : '🔒'}</span>
+          <h3>Class ${c.id}</h3>
+          <small>${c.desc}${c.ready && stars ? ` • ⭐ ${stars}` : ''}</small>
+          <span class="hub-tag ${c.ready ? 'ok' : ''}">${c.ready ? 'Demo ready' : 'Coming soon'}</span>
+        </button>`;
+      }).join('');
+
+      appShell.innerHTML = topBarHTML('Future Tech Minds <span>E-Book</span>', '', '') +
+        `<div class="page">
+          <div class="student-bar">
+            <label for="student-name-input">👩‍🎓 Student Name:</label>
+            <input id="student-name-input" type="text" placeholder="Enter your name (optional)" value="${studentName.replace(/"/g, '&quot;')}">
+          </div>
+          <h3>Choose your class</h3>
+          <p class="hub-sub">Select your class to view chapters, explanations, interactive Q&amp;A, and step-by-step solutions.</p>
+          <div class="hub-grid">${cards}</div>
+        </div>`;
+
+      document.getElementById('student-name-input').addEventListener('input', e => {
+        studentName = e.target.value.trim();
+        try { localStorage.setItem('ftm_student', studentName); } catch (err) {}
+      });
+      initTiltCards(appShell);
+      animateCardsIn('.hub-card');
+    }
+
+    async function renderChapters(cls) {
+      state.screen = 'chapters';
+      state.cls = cls;
+      appShell.innerHTML = topBarHTML(`Class ${cls} <span>Chapters</span>`, 'classes', '← Classes') +
+        `<div class="page"><p class="hub-sub">Loading chapters…</p></div>`;
+      try {
+        const data = await loadClassData(cls);
+        const cards = data.chapters.map((ch, idx) => {
+          const ready = !ch.comingSoon && ch.questions && ch.questions.length > 0;
+          const total = ready ? ch.questions.length : 0;
+          const done = ready ? chapterDoneCount(cls, ch.id, total) : 0;
+          return `<button class="hub-card" ${ready ? `data-nav="open-ch" data-idx="${idx}"` : 'disabled'}>
+            <span class="big">${ch.icon || '📘'}</span>
+            <h3>${ch.id}. ${ch.title}</h3>
+            ${ready
+              ? `<small>${done} of ${total} solved</small><div class="bar"><i style="width:${(done / total) * 100}%"></i></div><span class="hub-tag ok">${done === total ? 'Completed ✓' : 'Open Chapter'}</span>`
+              : `<small>Curriculum coming soon</small><span class="hub-tag">Coming soon</span>`}
+          </button>`;
+        }).join('');
+
+        appShell.innerHTML = topBarHTML(`${data.title} <span>Chapters</span>`, 'classes', '← Classes') +
+          `<div class="page">
+            <h3>Class ${cls} – Pick a chapter</h3>
+            <p class="hub-sub">${data.subtitle}</p>
+            <div class="hub-grid">${cards}</div>
+          </div>`;
+        initTiltCards(appShell);
+        animateCardsIn('.hub-card');
+      } catch (err) {
+        appShell.innerHTML = topBarHTML(`Class ${cls}`, 'classes', '← Classes') +
+          `<div class="page"><h3>Could not load Class ${cls} data</h3><p class="hub-sub">${err.message}</p></div>`;
+      }
+    }
+
+    function sqSVG(k) {
       let s = '<svg viewBox="-4 -4 158 158" class="sqv" role="img" aria-label="3 by 3 grid">';
       for (let i = 0; i < 9; i++)
-        s += `<rect x="${(i%3)*50}" y="${~~(i/3)*50}" width="50" height="50" fill="${k===1?'#3a57e8':'#8899dd'}" fill-opacity="${k===1?.55:.25}" stroke="#56628f"/>`;
-      if (k === 2) [[0,0],[50,0],[0,50],[50,50]].forEach((p,i) =>
-        s += `<rect x="${p[0]+3}" y="${p[1]+3}" width="94" height="94" fill="none" stroke="${['#e8346a','#ffc233','#2fc27a','#9b6bff'][i]}" stroke-width="4"/>`);
+        s += `<rect x="${(i % 3) * 50}" y="${~~(i / 3) * 50}" width="50" height="50" fill="${k === 1 ? '#3a57e8' : '#8899dd'}" fill-opacity="${k === 1 ? 0.55 : 0.25}" stroke="#56628f"/>`;
+      if (k === 2) [[0, 0], [50, 0], [0, 50], [50, 50]].forEach((p, i) =>
+        s += `<rect x="${p[0] + 3}" y="${p[1] + 3}" width="94" height="94" fill="none" stroke="${['#e8346a', '#ffc233', '#2fc27a', '#9b6bff'][i]}" stroke-width="4"/>`);
       if (k === 3) s += '<rect x="2" y="2" width="146" height="146" fill="none" stroke="#ff8a3d" stroke-width="5"/>';
       return s + '</svg>';
-    };
+    }
 
-    const line = m =>
-      `<div class="ln">${[1,2,3,4,5].map(n =>
-        `<div class="sl${m[n]?' f':''}"><small>${n}</small>${m[n]?'🧒<b>'+m[n]+'</b>':'?'}</div>`
+    function lineViz(m) {
+      return `<div class="ln">${[1, 2, 3, 4, 5].map(n =>
+        `<div class="sl${m[n] ? ' f' : ''}"><small>${n}</small>${m[n] ? '🧒<b>' + m[n] + '</b>' : '?'}</div>`
       ).join('')}</div>`;
+    }
 
-    const Q = [
-      {
-        n:'1', skill:'Logical reasoning',
-        t:'Use the clues to find the number each fruit represents.',
-        type:'num', key:[10,15,5],
-        render: () => [['🥭🥭',20,'🥭'],['🍎🥭',25,'🍎'],['🍓🍓🍎',25,'🍓']].map((r,i) =>
-          `<div class="scale"><span>${r[0]}</span><span class="bal">⚖️</span><b>${r[1]}</b>` +
-          `<label>${r[2]} = <input class="num" type="number" inputmode="numeric" data-p="${i}" aria-label="Value of ${r[2]}"></label></div>`
-        ).join(''),
-        tip: v => v[0]==='20' ? 'Two mangoes together make 20. Share that between them!' : '',
-        hints: [
-          'Start with the scale that has only one kind of fruit.',
-          'Once you know the mango, use it in the second scale.',
-          'Two strawberries and an apple make 25. You already know the apple!'
-        ],
-        steps: [
-          { t:'Two mangoes balance 20, so one mango is 20 ÷ 2 = 10.', v:'<div class="eq">🥭 + 🥭 = 20</div><div class="eq">🥭 = 10</div>' },
-          { t:'An apple and a mango balance 25. The mango is 10, so the apple is 25 − 10 = 15.', v:'<div class="eq">🍎 + 🥭(10) = 25</div><div class="eq">🍎 = 15</div>' },
-          { t:'Two strawberries and an apple balance 25. Two strawberries = 25 − 15 = 10, so one strawberry is 10 ÷ 2 = 5.', v:'<div class="eq">🍓 + 🍓 + 🍎(15) = 25</div><div class="eq">🍓 = 5</div>' }
-        ]
-      },
-      {
-        n:'2', skill:'Decomposition',
-        t:'How many squares are there in this picture?',
-        type:'num', key:[14],
-        render: () => '<div class="hg">' + '<i>🐴</i>'.repeat(9) + '</div>' +
-          '<input class="num" type="number" inputmode="numeric" data-p="0" aria-label="Number of squares">',
-        hints: ['Count the small squares first.','Now look for bigger squares made of 4 small ones.','Don\'t forget the biggest square around everything.'],
-        steps: [
-          { t:'Count the small 1×1 squares: there are 9.',    v: sq(1) },
-          { t:'Look for 2×2 squares: there are 4.',           v: sq(2) },
-          { t:'There is 1 big 3×3 square.',                   v: sq(3) },
-          { t:'Add them up: 9 + 4 + 1 = 14 squares.',        v: sq(0)+'<div class="eq">9 + 4 + 1 = 14</div>' }
-        ]
-      },
-      mc('3a','Find the one that is different from the others.',['✉️','☎️','✈️','🖥️'],['Letter','Telephone','Aeroplane','Computer'],2,'Letter, telephone and computer are ways to communicate. The aeroplane is for travel, so C is different.'),
-      mc('3b','Find the one that is different from the others.',['🚁','🚌','🚆','📺'],['Helicopter','Bus','Train','Television'],3,'Helicopter, bus and train are used for travel. The television is not, so D is different.'),
-      mc('3c','Find the one that is different from the others.',['🐔','🐘','🦌','🐄'],['Hen','Elephant','Deer','Cow'],0,'Elephant, deer and cow walk on four legs. The hen has two legs, so A is different.'),
-      {
-        n:'4', skill:'Logical reasoning',
-        t:'Who is first? Use the clues to find each kid\'s place in the ice cream line. Tap a box to mark it.',
-        type:'grid', key:[2,1,0,4,3],
-        say:'Clue 1: Anika is not the last. Clue 2: Alisha is in the exact middle. Clue 3: The person with the shortest name is first. Clue 4: Chirag stands right behind Ellie.',
-        render: () =>
-          '<ol class="cl">' +
-          '<li><b>Anika</b> is not the last to order.</li>' +
-          '<li><b>Alisha</b> ends up in exactly the middle of the line.</li>' +
-          '<li>The person with the shortest name is first in line.</li>' +
-          '<li><b>Chirag</b> is <b>Ellie\'s</b> big brother, so he stays right behind her.</li>' +
-          '</ol>' +
-          '<div class="lg-wrapper"><table class="lg"><tr><th>Kids</th>' +
-          [1,2,3,4,5].map(n=>`<th>${n}</th>`).join('') + '</tr>' +
-          N.map((n,r) =>
-            `<tr data-p="${r}"><th>${n}</th>` +
-            [0,1,2,3,4].map(c=>`<td tabindex="0" data-r="${r}" data-c="${c}" aria-label="${n} place ${c+1}"></td>`).join('') +
-            '</tr>'
-          ).join('') + '</table></div>',
-        hints: [
-          'Start with the clue that gives an exact place: who is in the middle?',
-          'Count the letters in each name to find the shortest.',
-          'Chirag and Ellie need two places side by side.'
-        ],
-        steps: [
-          { t:'Clue 2: Alisha is in the exact middle, so she is 3rd.',           v: line({3:'Alisha'}) },
-          { t:'Clue 3: Zoya has the shortest name (4 letters), so she is 1st.',   v: line({1:'Zoya',3:'Alisha'}) },
-          { t:'Clue 4: Chirag is right behind Ellie. Ellie is 4th, Chirag is 5th.', v: line({1:'Zoya',3:'Alisha',4:'Ellie',5:'Chirag'}) },
-          { t:'Clue 1: Anika is not last. Only place 2 is left.',                 v: line({1:'Zoya',2:'Anika',3:'Alisha',4:'Ellie',5:'Chirag'}) }
-        ]
+    function mcTilesHTML(q, hl, showNames) {
+      return `<div class="ops${hl == null ? '' : ' st'}">` +
+        q.emojis.map((em, i) => {
+          const s = state.qState;
+          let cls = '';
+          if (hl != null) cls = i === hl ? ' hl' : ' dim';
+          else if (s.checked && s.sel === i) cls = s.ok ? ' ok' : ' bad';
+          else if (s.sel === i) cls = ' sel';
+          return `<button class="opt${cls}" data-qact="sel" data-i="${i}">
+            <span class="em">${em}</span><span class="lt">${'ABCD'[i]}</span>
+            ${showNames ? `<small>${q.names[i]}</small>` : ''}
+          </button>`;
+        }).join('') + '</div>';
+    }
+
+    function saveTransientInputs() {
+      const numEl = document.getElementById('q-single-num');
+      if (numEl) state.qState.num = numEl.value;
+      const scaleInputs = appShell.querySelectorAll('input.num[data-p]');
+      if (scaleInputs.length) {
+        state.qState.nums = [...scaleInputs].map(el => el.value);
       }
-    ];
-
-    /* ============================================================
-       16. GAME ENGINE
-    ============================================================ */
-    let cur = 0;
-    let st  = Q.map(() => ({ d:0, s:0, t:0, h:0, v:0 }));
-    const tot = () => st.reduce((a, x) => a + x.s, 0);
-    const MAX = Q.length * 3;
-
-    const readVal = {
-      num:  el => [...el.querySelectorAll('input')].map(i => i.value.trim()),
-      mcq:  el => { const s = el.querySelector('.opt.sel'); return [s ? +s.dataset.i : -1]; },
-      grid: el => N.map((_,r) =>
-        [...el.querySelectorAll(`td[data-r="${r}"]`)].findIndex(t => t.classList.contains('on'))
-      )
-    };
-
-    function tabs() {
-      document.getElementById('tabs').innerHTML = [
-        ...Q.map((q, i) =>
-          `<button class="tb${i===cur?' on':''}${st[i].d?' dn':''}" data-i="${i}" aria-label="Question ${q.n}">${q.n}</button>`
-        ),
-        `<button class="tb${cur===Q.length?' on':''}" data-i="${Q.length}" aria-label="Results">🏆</button>`
-      ].join('');
-      document.getElementById('stars').textContent = '⭐ ' + tot();
-      document.getElementById('pv').style.visibility = cur > 0 ? 'visible' : 'hidden';
-      document.getElementById('nx').style.visibility = cur < Q.length ? 'visible' : 'hidden';
-      document.getElementById('nx').textContent = cur === Q.length - 1 ? 'See results ›' : 'Next ›';
     }
 
-    function say(m) {
-      const el = document.getElementById('say');
-      if (el) el.textContent = m;
-    }
-
-    function show(i) {
-      cur = i;
+    function renderBookView() {
+      state.screen = 'book';
       if (window.speechSynthesis) window.speechSynthesis.cancel();
-      const pg = document.getElementById('pg');
-      pg.style.animation = 'none';
-      pg.offsetWidth; // force reflow for animation restart
-      pg.style.animation = '';
-      tabs();
+      const data = classCache[state.cls];
+      const ch = data.chapters[state.chIdx];
+      const qs = ch.questions;
 
-      if (i === Q.length) return result(pg);
+      const top = topBarHTML(`Class ${state.cls} • ${ch.icon || '📘'} <span>Ch ${ch.id}: ${ch.title}</span>`, 'chapters', '← Chapters');
+      const modeTabs = `<div class="mode-tabs">
+        <button data-qact="mode" data-m="learn" aria-pressed="${state.tab === 'learn'}">📖 Explain / Learn</button>
+        <button data-qact="mode" data-m="practice" aria-pressed="${state.tab === 'practice'}">✏️ Practice (${qs.length})</button>
+        <button data-qact="mode" data-m="summary" aria-pressed="${state.tab === 'summary'}">🏆 Summary</button>
+      </div>`;
 
-      const q = Q[i], s = st[i];
-      pg.innerHTML =
-        `<div class="meta"><span class="chip">Question ${q.n}</span><span class="chip s">${q.skill}</span>` +
-        `<button class="ghost" id="rd">🔊 Read to me</button></div>` +
-        `<h3>${q.t}</h3><div id="body">${q.render()}</div>` +
-        `<div class="acts">` +
-        `<button class="btn" id="chk">Check my answer ✓</button>` +
-        `<button class="btn alt" id="hint">💡 Hint</button>` +
-        `<button class="btn alt" id="how">👣 Show me how</button></div>` +
-        `<div class="bot"><span>🤖</span><p id="say">${
-          s.d ? 'You earned ' + '⭐'.repeat(s.s) + ' here. Want to see the steps?' : 'Take your time. You can do it!'
-        }</p></div><div id="sol"></div>`;
+      let content = '';
+      if (state.tab === 'learn') {
+        content = `
+          <div class="meta">
+            <span class="chip">Chapter ${ch.id}</span>
+            <span class="chip s">${ch.skill || ''}</span>
+            <button class="ghost" data-qact="read-learn">🔊 Read lesson</button>
+          </div>
+          <div class="learn-box">${ch.learn}</div>
+          <div class="acts">
+            <button class="btn" data-qact="mode" data-m="practice">Start Practice Questions ✏️</button>
+          </div>`;
+      } else if (state.tab === 'summary') {
+        content = renderSummaryHTML(data, ch);
+      } else {
+        const q = qs[state.qi];
+        const qsKey = qKey(state.cls, ch.id, state.qi);
+        const saved = progress[qsKey];
+        const s = state.qState;
 
-      document.getElementById('rd').onclick = () => {
-        if (!window.speechSynthesis) return;
-        const u = new SpeechSynthesisUtterance(q.t + ' ' + (q.say || ''));
-        u.rate = 0.9;
-        speechSynthesis.speak(u);
-      };
+        const dots = `<div class="q-dots">${qs.map((item, i) => {
+          const isDone = progress[qKey(state.cls, ch.id, i)]?.done;
+          return `<button class="tb${i === state.qi ? ' on' : ''}${isDone ? ' dn' : ''}" data-qact="goto-q" data-i="${i}">${item.n || (i + 1)}</button>`;
+        }).join('')}<button class="tb" data-qact="mode" data-m="summary" aria-label="Chapter Summary">🏆</button></div>`;
 
-      const bodyEl = document.getElementById('body');
-      bodyEl.onclick = e => {
-        const o = e.target.closest('.opt'), c = e.target.closest('td');
-        if (o) {
-          bodyEl.querySelectorAll('.opt').forEach(x => { x.classList.remove('sel','ok','bad'); x.removeAttribute('data-p'); });
-          o.classList.add('sel'); o.dataset.p = 0; tone(440, 0.08);
+        let widget = '';
+        if (q.type === 'num') {
+          const vals = s.nums || [];
+          const parts = s.parts || [];
+          widget = q.scales.map((r, i) => {
+            const cls = s.checked ? (parts[i] ? ' ok' : ' bad') : '';
+            return `<div class="scale"><span>${r[0]}</span><span class="bal">⚖️</span><b>${r[1]}</b>
+              <label>${r[2]} = <input class="num${cls}" type="number" inputmode="numeric" data-p="${i}" value="${vals[i] || ''}" aria-label="Value of ${r[2]}"></label></div>`;
+          }).join('');
+        } else if (q.type === 'squares') {
+          const cls = s.checked ? (s.ok ? ' ok' : ' bad') : '';
+          widget = `<div class="hg">${'<i>🐴</i>'.repeat(9)}</div>
+            <input id="q-single-num" class="num${cls}" type="number" inputmode="numeric" placeholder="?" value="${s.num || ''}" aria-label="Number of squares">`;
+        } else if (q.type === 'mcq') {
+          widget = mcTilesHTML(q, null, false);
+        } else if (q.type === 'grid') {
+          const gridSel = s.grid || [-1, -1, -1, -1, -1];
+          widget = `<ol class="cl">${q.clues.map(c => `<li>${c}</li>`).join('')}</ol>
+            <div class="lg-wrapper"><table class="lg"><tr><th>Kids</th>${[1, 2, 3, 4, 5].map(n => `<th>${n}</th>`).join('')}</tr>
+            ${q.names.map((nm, r) => `<tr><th>${nm}</th>${[0, 1, 2, 3, 4].map(c =>
+              `<td tabindex="0" class="${gridSel[r] === c ? 'on' : ''}" data-qact="grid-cell" data-r="${r}" data-c="${c}" aria-label="${nm} place ${c + 1}">${gridSel[r] === c ? '✔' : ''}</td>`
+            ).join('')}</tr>`).join('')}
+            </table></div>`;
+        } else if (q.t === 'choice') {
+          widget = (q.vis ? `<div class="vis-box">${q.vis}</div>` : '') +
+            `<div class="ops">${q.o.map((opt, i) => {
+              let cls = '';
+              if (s.checked && s.sel === i) cls = s.ok ? ' ok' : ' bad';
+              else if (s.sel === i) cls = ' sel';
+              return `<button class="opt${cls}" data-qact="sel" data-i="${i}">${opt}</button>`;
+            }).join('')}</div>`;
+        } else if (q.t === 'number') {
+          const cls = s.checked ? (s.ok ? ' ok' : ' bad') : '';
+          widget = `<div class="acts"><input id="q-single-num" class="num${cls}" style="width:150px" type="number" inputmode="numeric" placeholder="Type here" value="${s.num || ''}" aria-label="Your answer"></div>`;
+        } else if (q.t === 'classify') {
+          widget = q.items.map((it, i) => {
+            const v = (s.cls || {})[i];
+            return `<div class="c6-item"><span>${it[0]}</span><span class="c6-seg">
+              <button data-qact="classify" data-i="${i}" data-v="S" aria-pressed="${v === 'S'}">Simple</button>
+              <button data-qact="classify" data-i="${i}" data-v="D" aria-pressed="${v === 'D'}">Difficult</button>
+            </span></div>`;
+          }).join('');
+        } else if (q.t === 'order') {
+          const seq = s.seq || [];
+          widget = `<div class="ops" style="grid-template-columns:1fr">${q.items.map((it, i) => {
+            const p = seq.indexOf(i);
+            return `<button class="opt${p >= 0 ? ' sel' : ''}" style="align-items:flex-start;text-align:left;padding:12px 16px" data-qact="order" data-i="${i}">${p >= 0 ? `<b>${p + 1}.</b> ` : ''}${it}</button>`;
+          }).join('')}</div><button class="btn alt" data-qact="order-reset">Start again</button>`;
         }
-        if (c) {
-          const on = c.classList.contains('on');
-          c.parentNode.querySelectorAll('td').forEach(x => { x.classList.remove('on'); x.textContent = ''; });
-          if (!on) { c.classList.add('on'); c.textContent = '✔'; }
-          tone(440, 0.08);
-        }
-      };
 
-      bodyEl.onkeydown = e => {
-        if ((e.key === 'Enter' || e.key === ' ') && e.target.closest('td')) {
-          e.preventDefault(); e.target.closest('td').click();
-        }
-      };
+        const solHTML = s.stepIdx != null ? renderSolutionHTML(q, s.stepIdx) : '';
+        const botMsg = s.msg || (saved?.done ? `You already solved this (${'⭐'.repeat(saved.stars)}). Try again or open the step-by-step guide!` : 'Take your time. Check your answer or ask for a hint!');
+        const botCls = s.checked ? (s.ok ? 'ok' : 'bad') : '';
 
-      document.getElementById('chk').onclick = () => check(q, s);
-      document.getElementById('hint').onclick = () => {
-        const h = q.hints[Math.min(s.h, q.hints.length - 1)];
-        if (!s.d && s.h < q.hints.length) s.h++;
-        say('💡 ' + h);
-      };
-      document.getElementById('how').onclick = () => { if (!s.d) s.v = 1; steps(q, 0); };
+        content = `${dots}
+          <div class="meta">
+            <span class="chip">Question ${q.n || (state.qi + 1)}</span>
+            ${q.skill ? `<span class="chip s">${q.skill}</span>` : `<span class="chip s">${ch.title}</span>`}
+            <button class="ghost" data-qact="read-q">🔊 Read to me</button>
+          </div>
+          <h3 class="q-title">${q.t || q.q}</h3>
+          ${widget}
+          <div class="acts">
+            <button class="btn" id="chk-btn" data-qact="check">Check my answer ✓</button>
+            <button class="btn alt" data-qact="hint">💡 Hint</button>
+            <button class="btn alt" data-qact="steps">👣 Step-by-step solution</button>
+          </div>
+          <div class="bot"><span>🤖</span><p class="${botCls}">${botMsg}</p></div>
+          ${q.review ? `<p><span class="note-tag">${q.review}</span></p>` : ''}
+          ${solHTML}
+          <div class="nav">
+            ${state.qi > 0 ? `<button class="btn alt" data-qact="goto-q" data-i="${state.qi - 1}">‹ Previous</button>` : '<span></span>'}
+            ${state.qi < qs.length - 1 ? `<button class="btn" data-qact="goto-q" data-i="${state.qi + 1}">Next question ›</button>` : `<button class="btn" data-qact="mode" data-m="summary">See Summary 🏆</button>`}
+          </div>`;
+      }
 
-      // Scroll top of book into view on mobile
-      document.getElementById('book').scrollIntoView({ behavior: 'smooth', block: 'start' });
+      appShell.innerHTML = `${top}<article class="page" id="active-page">${modeTabs}${content}</article>`;
+      syncScrollLayout(false);
+      if (hasGSAP && !reduceMotion) {
+        gsap.fromTo('#active-page', { y: 14, autoAlpha: 0 }, { y: 0, autoAlpha: 1, duration: 0.4, ease: 'power3.out', clearProps: 'transform' });
+      }
     }
 
-    function check(q, s) {
-      const el = document.getElementById('body');
-      const a  = readVal[q.type](el);
-      if (a.every(v => v === '' || v === -1))
-        return say(q.type === 'mcq' ? 'Tap a picture first, then check.' : 'Fill in your answer first, then check.');
-      const parts = a.map((v, i) => +v === q.key[i] && v !== '');
-      s.t++;
-      el.querySelectorAll('[data-p]').forEach(n => {
-        n.classList.remove('ok','bad');
-        n.classList.add(parts[+n.dataset.p] ? 'ok' : 'bad');
+    function scrollToSolution() {
+      requestAnimationFrame(() => {
+        const solEl = appShell.querySelector('.sol');
+        if (!solEl) return;
+        if (lenis) {
+          lenis.resize();
+          lenis.scrollTo(solEl, { offset: -24, duration: 0.7 });
+        } else {
+          solEl.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        }
       });
-      if (parts.every(Boolean)) {
-        if (!s.d) { s.d = 1; s.s = s.v ? 1 : Math.max(1, 3 - (s.t - 1) - s.h); }
-        win(); pop();
-        say(['Brilliant! You cracked it! 🎉','Yes! Great thinking!','Super! That\'s correct!'][s.t % 3] + ' ' + '⭐'.repeat(s.s));
-        tabs();
+    }
+
+    function renderSolutionHTML(q, k) {
+      // Normalize steps across Class 3 and Class 6 formats
+      let stepList = [];
+      if (q.type === 'mcq') {
+        stepList = [
+          { t: 'Name each picture.', v: mcTilesHTML(q, -1, true) },
+          { t: q.why, v: mcTilesHTML(q, q.key[0], true) }
+        ];
+      } else if (q.steps) {
+        stepList = q.steps.map(st => {
+          let v = st.v || '';
+          if (st.sq !== undefined) v = sqSVG(st.sq) + (st.eq ? `<div class="eq">${st.eq}</div>` : '');
+          if (st.line) v = lineViz(st.line);
+          return { t: st.t, v };
+        });
+      } else if (q.s) {
+        stepList = q.s.map(txt => ({ t: txt, v: '' }));
+      }
+      const curStep = stepList[Math.min(k, stepList.length - 1)];
+      return `<div class="sol">
+        <h4>👣 Step-by-step Solution (${k + 1} / ${stepList.length})</h4>
+        ${curStep.v ? `<div class="viz">${curStep.v}</div>` : ''}
+        <ol>${stepList.slice(0, k + 1).map((st, idx) => `<li class="${idx === k ? 'now' : ''}">${st.t}</li>`).join('')}</ol>
+        <div class="acts">
+          ${k > 0 ? `<button class="btn alt" data-qact="sol-step" data-k="${k - 1}">‹ Previous step</button>` : ''}
+          ${k < stepList.length - 1 ? `<button class="btn" data-qact="sol-step" data-k="${k + 1}">Next step ›</button>` : `<b>🎉 Complete solution shown!</b>`}
+        </div>
+      </div>`;
+    }
+
+    function renderSummaryHTML(data, ch) {
+      const qs = ch.questions;
+      const maxStars = qs.length * 3;
+      let earned = 0, solved = 0;
+      const skills = {};
+      qs.forEach((q, i) => {
+        const rec = progress[qKey(state.cls, ch.id, i)];
+        const st = rec?.stars || 0;
+        if (rec?.done) solved++;
+        earned += st;
+        const sk = q.skill || ch.title;
+        skills[sk] = skills[sk] || [0, 0];
+        skills[sk][0] += st;
+        skills[sk][1] += 3;
+      });
+      const pct = maxStars ? Math.round((earned / maxStars) * 100) : 0;
+      const tier = pct >= 80 ? 'Gold Thinker 🥇' : pct >= 50 ? 'Silver Thinker 🥈' : 'Rising Thinker 🥉';
+      const nextChIdx = state.chIdx + 1;
+      const hasNext = data.chapters[nextChIdx] && !data.chapters[nextChIdx].comingSoon;
+
+      return `<div class="cert-box">
+        <div style="font-size:2.4rem">🏆</div>
+        <h3>Chapter ${ch.id} Summary</h3>
+        ${studentName ? `<p style="margin:6px 0;font-weight:700;color:var(--acc)">Awarded to ${studentName}</p>` : ''}
+        <div class="eq">${tier}</div>
+        <p>${solved} of ${qs.length} questions solved • <b>⭐ ${earned} of ${maxStars}</b> stars</p>
+      </div>
+      ${Object.entries(skills).map(([k, v]) =>
+        `<div>${k}: ${Math.round((v[0] / v[1]) * 100)}%<div class="bar"><i style="width:${(v[0] / v[1]) * 100}%"></i></div></div>`
+      ).join('')}
+      <div class="acts">
+        <button class="btn alt" onclick="window.print()">🖨️ Print Report</button>
+        <button class="btn alt" data-qact="mode" data-m="practice">Review Questions</button>
+        ${hasNext ? `<button class="btn" data-qact="next-ch" data-idx="${nextChIdx}">Next Chapter →</button>` : ''}
+      </div>`;
+    }
+
+    function checkCurrentQuestion() {
+      saveTransientInputs();
+      const ch = classCache[state.cls].chapters[state.chIdx];
+      const q = ch.questions[state.qi];
+      const s = state.qState;
+      s.tries = (s.tries || 0) + 1;
+
+      let ok = false;
+      if (q.type === 'num') {
+        const vals = (s.nums || []).map(v => (v || '').trim());
+        if (!vals.length || vals.every(v => v === '')) { s.msg = 'Fill in your answers first, then check.'; s.checked = false; return renderBookView(); }
+        s.parts = q.key.map((ans, i) => vals[i] !== '' && +vals[i] === ans);
+        ok = s.parts.every(Boolean);
+        if (!ok) {
+          const rightCount = s.parts.filter(Boolean).length;
+          s.msg = (vals[0] === '20' && q.tip20) ? q.tip20 : `${rightCount} of ${q.key.length} are right. Fix the red ones and try again!`;
+        }
+      } else if (q.type === 'squares') {
+        const v = (s.num || '').trim();
+        if (v === '') { s.msg = 'Enter a number first, then check.'; s.checked = false; return renderBookView(); }
+        ok = (+v === q.key[0]);
+        if (!ok) s.msg = 'Not quite. Try counting 1×1, 2×2, and 3×3 squares—or tap Hint!';
+      } else if (q.type === 'mcq') {
+        if (s.sel == null) { s.msg = 'Tap a picture first, then check.'; s.checked = false; return renderBookView(); }
+        ok = (s.sel === q.key[0]);
+        if (!ok) s.msg = 'Not quite. Try again, or tap Hint!';
+      } else if (q.type === 'grid') {
+        const g = s.grid || [-1, -1, -1, -1, -1];
+        if (g.every(v => v === -1)) { s.msg = 'Tap boxes in the grid first, then check.'; s.checked = false; return renderBookView(); }
+        const parts = q.key.map((ans, r) => g[r] === ans);
+        ok = parts.every(Boolean);
+        if (!ok) s.msg = `${parts.filter(Boolean).length} of ${q.key.length} kids are in the right spot. Check the clues again!`;
+      } else if (q.t === 'choice') {
+        if (s.sel == null) { s.msg = 'Pick an answer first.'; s.checked = false; return renderBookView(); }
+        ok = (s.sel === q.a);
+        if (!ok) s.msg = 'Not quite yet. Try again, or open Hint or Step-by-step solution!';
+      } else if (q.t === 'number') {
+        const v = (s.num || '').trim();
+        if (v === '') { s.msg = 'Type a number first.'; s.checked = false; return renderBookView(); }
+        ok = (parseFloat(v) === q.a);
+        if (!ok) s.msg = 'Not quite yet. Try again, or open Hint or Step-by-step solution!';
+      } else if (q.t === 'classify') {
+        const c = s.cls || {};
+        if (Object.keys(c).length < q.items.length) { s.msg = 'Answer every line first.'; s.checked = false; return renderBookView(); }
+        ok = q.items.every((it, i) => c[i] === it[1]);
+        if (!ok) s.msg = 'Some lines need another look. Remember: Simple = clear steps, Difficult = many choices!';
+      } else if (q.t === 'order') {
+        const seq = s.seq || [];
+        if (seq.length < q.items.length) { s.msg = 'Tap all the steps in order first.'; s.checked = false; return renderBookView(); }
+        ok = (seq.join(',') === q.a.join(','));
+        if (!ok) s.msg = 'Not quite the right order. Tap "Start again" or check Hint!';
+      }
+
+      s.checked = true;
+      s.ok = ok;
+      if (ok) {
+        const key = qKey(state.cls, ch.id, state.qi);
+        const stars = s.usedSol ? 1 : Math.max(1, 3 - (s.tries - 1) - (s.hintUsed || 0));
+        const prev = progress[key]?.stars || 0;
+        progress[key] = { done: true, stars: Math.max(prev, stars) };
+        saveProgress();
+        win();
+        pop();
+        s.msg = `🎉 Brilliant! You cracked it! ${'⭐'.repeat(stars)}`;
       } else {
         oops();
-        const r = parts.filter(Boolean).length;
-        say((q.tip && q.tip(a)) || (parts.length > 1 ? `${r} of ${parts.length} are right. Fix the red ones and try again.` : 'Not quite. Try again, or tap Hint.'));
       }
+      renderBookView();
     }
 
-    function steps(q, k) {
-      const sl = document.getElementById('sol');
-      sl.innerHTML =
-        `<div class="sol"><h4>Step-by-step solution</h4>` +
-        `<div class="viz">${q.steps[k].v}</div>` +
-        `<ol>${q.steps.slice(0, k+1).map((x,j) => `<li class="${j===k?'now':''}">${x.t}</li>`).join('')}</ol>` +
-        `<div class="acts">` +
-        (k ? `<button class="btn alt" id="sb">‹ Previous step</button>` : '') +
-        (k < q.steps.length-1 ? `<button class="btn" id="sn">Next step ›</button>` : `<b>🎉 That's the whole solution!</b>`) +
-        `</div></div>`;
-      const sb = document.getElementById('sb'), sn = document.getElementById('sn');
-      if (sb) sb.onclick = () => steps(q, k-1);
-      if (sn) sn.onclick = () => { tone(520, 0.08); steps(q, k+1); };
-      sl.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-    }
+    /* ============================================================
+       7. GLOBAL EVENT DELEGATION
+    ============================================================ */
+    appShell.addEventListener('click', e => {
+      const navBtn = e.target.closest('[data-nav]');
+      if (navBtn) {
+        const nav = navBtn.dataset.nav;
+        tone(520, 0.08);
+        if (nav === 'cover') return closeBook();
+        if (nav === 'sound') { snd = !snd; navBtn.textContent = snd ? '🔊' : '🔇'; return; }
+        if (nav === 'classes') return renderClasses();
+        if (nav === 'chapters') return renderChapters(+navBtn.dataset.cls || state.cls);
+        if (nav === 'open-ch') {
+          state.chIdx = +navBtn.dataset.idx;
+          state.tab = 'learn';
+          state.qi = 0;
+          state.qState = {};
+          return renderBookView();
+        }
+      }
 
-    function result(pg) {
-      const sk = {};
-      Q.forEach((q, i) => { const o = sk[q.skill] = sk[q.skill]||[0,0]; o[0]+=st[i].s; o[1]+=3; });
-      const t  = tot();
-      const md = t>=15 ? 'Gold Thinker 🥇' : t>=10 ? 'Silver Thinker 🥈' : 'Rising Thinker 🥉';
-      pg.innerHTML =
-        `<h3>Chapter 1 complete!</h3><div class="eq">${md}</div>` +
-        `<p>You collected <b>⭐ ${t} of ${MAX}</b> stars.</p>` +
-        Object.entries(sk).map(([k,v]) =>
-          `<div>${k}: ${Math.round(v[0]/v[1]*100)}%<div class="bar"><i style="width:${v[0]/v[1]*100}%"></i></div></div>`
-        ).join('') +
-        `<div class="bot"><span>🤖</span><p>${t<MAX?'Go back to any question to try again and earn more stars.':'Perfect score! Chapter 2 is waiting.'}</p></div>` +
-        `<div class="acts"><button class="btn" id="re">Play again 🔄</button></div>`;
-      document.getElementById('re').onclick = () => { st = Q.map(()=>({d:0,s:0,t:0,h:0,v:0})); show(0); };
-      if (t >= 10) { win(); pop(); }
-    }
+      const qBtn = e.target.closest('[data-qact]');
+      if (!qBtn) return;
+      const act = qBtn.dataset.qact;
+      const ch = classCache[state.cls].chapters[state.chIdx];
+      const q = ch.questions[state.qi];
+      const s = state.qState;
 
-    // Tab nav
-    document.getElementById('tabs').onclick = e => {
-      const b = e.target.closest('.tb');
-      if (b) show(+b.dataset.i);
+      if (act === 'mode') { state.tab = qBtn.dataset.m; state.qState = {}; renderBookView(); return syncScrollLayout(true); }
+      if (act === 'next-ch') { state.chIdx = +qBtn.dataset.idx; state.tab = 'learn'; state.qi = 0; state.qState = {}; renderBookView(); return syncScrollLayout(true); }
+      if (act === 'goto-q') { state.qi = +qBtn.dataset.i; state.qState = {}; renderBookView(); return syncScrollLayout(true); }
+      if (act === 'read-learn') return speakText(ch.title + '. ' + ch.learn);
+      if (act === 'read-q') return speakText((q.t || q.q) + ' ' + (q.say || ''));
+      if (act === 'sel') { s.sel = +qBtn.dataset.i; s.checked = false; tone(440, 0.08); return renderBookView(); }
+      if (act === 'grid-cell') {
+        const r = +qBtn.dataset.r, c = +qBtn.dataset.c;
+        s.grid = s.grid || [-1, -1, -1, -1, -1];
+        s.grid[r] = (s.grid[r] === c) ? -1 : c;
+        s.checked = false;
+        tone(440, 0.08);
+        return renderBookView();
+      }
+      if (act === 'classify') {
+        s.cls = s.cls || {};
+        s.cls[+qBtn.dataset.i] = qBtn.dataset.v;
+        s.checked = false;
+        tone(440, 0.08);
+        return renderBookView();
+      }
+      if (act === 'order') {
+        s.seq = s.seq || [];
+        const idx = +qBtn.dataset.i;
+        if (s.seq.indexOf(idx) < 0) s.seq.push(idx);
+        s.checked = false;
+        tone(440, 0.08);
+        return renderBookView();
+      }
+      if (act === 'order-reset') { s.seq = []; s.checked = false; return renderBookView(); }
+      if (act === 'hint') {
+        saveTransientInputs();
+        s.hintUsed = (s.hintUsed || 0) + 1;
+        const hints = q.hints || [q.hint];
+        const h = hints[Math.min(s.hintIdx || 0, hints.length - 1)];
+        s.hintIdx = Math.min((s.hintIdx || 0) + 1, hints.length - 1);
+        s.msg = '💡 ' + h;
+        s.checked = false;
+        return renderBookView();
+      }
+      if (act === 'steps') { saveTransientInputs(); s.usedSol = true; s.stepIdx = 0; renderBookView(); return scrollToSolution(); }
+      if (act === 'sol-step') { saveTransientInputs(); s.stepIdx = +qBtn.dataset.k; tone(520, 0.08); renderBookView(); return scrollToSolution(); }
+      if (act === 'check') return checkCurrentQuestion();
+    });
+
+    appShell.addEventListener('keydown', e => {
+      if ((e.key === 'Enter' || e.key === ' ') && e.target.closest('td[data-qact="grid-cell"]')) {
+        e.preventDefault();
+        e.target.click();
+      }
+    });
+
+    /* ============================================================
+       8. COVER CONTROLS & BOOTSTRAP
+    ============================================================ */
+    openBookBtn.onclick = openBook;
+    const navStartBtn = document.getElementById('nav-start-btn');
+    const bottomStartBtn = document.getElementById('bottom-start-btn');
+    if (navStartBtn) navStartBtn.onclick = openBook;
+    if (bottomStartBtn) bottomStartBtn.onclick = openBook;
+
+    scrollHintBtn.onclick = () => {
+      const target = document.getElementById('story-scene');
+      if (lenis && target) lenis.scrollTo(target);
+      else if (target) target.scrollIntoView({ behavior: 'smooth' });
     };
-    document.getElementById('pv').onclick = () => show(cur - 1);
-    document.getElementById('nx').onclick = () => show(cur + 1);
-    document.getElementById('snd').onclick = e => {
-      snd = !snd;
-      e.target.textContent = snd ? '🔊' : '🔇';
-    };
 
+    const fitscalezBtn = document.getElementById('fitscalez-btn');
+    const fitscalezPop = document.getElementById('fitscalez-pop');
+    let fzTimer = null;
+    if (fitscalezBtn && fitscalezPop) {
+      fitscalezBtn.onclick = () => {
+        [523, 659, 784].forEach((f, i) => tone(f, 0.12, i * 0.06));
+        pop();
+        fitscalezPop.hidden = !fitscalezPop.hidden;
+        clearTimeout(fzTimer);
+        if (!fitscalezPop.hidden) fzTimer = setTimeout(() => { fitscalezPop.hidden = true; }, 3500);
+      };
+    }
+
+    let resizeTimer;
+    window.addEventListener('resize', () => {
+      clearTimeout(resizeTimer);
+      resizeTimer = setTimeout(resize, 80);
+    }, { passive: true });
+
+    resize();
+    initImages();
+    initCinematicLanding();
+    initMagnetic(document);
+    initTiltCards(document);
+    scheduleRender();
   })();
   </script>
 
@@ -1556,13 +2126,8 @@
           }
         });
         navigator.serviceWorker.register('/sw.js', { updateViaCache: 'none' })
-          .then(function (reg) {
-            reg.update();
-            console.log('[SW] Registered, scope:', reg.scope);
-          })
-          .catch(function (err) {
-            console.warn('[SW] Registration failed (offline mode not available):', err);
-          });
+          .then(function (reg) { reg.update(); })
+          .catch(function (err) { console.warn('[SW] Registration failed:', err); });
       });
     }
   </script>

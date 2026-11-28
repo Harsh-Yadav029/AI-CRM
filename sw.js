@@ -1,15 +1,19 @@
-// Future Tech Minds 3 - Service Worker
-// Network-first for HTML (always fresh deploys), cache-first for 359 frames
+// Future Tech Minds - Service Worker (v4)
+// Network-first for HTML/JSON (fresh deploys), cache-first for vendor JS & 359 WebP frames
 
-const CACHE_NAME = 'ftm3-v3';
+const CACHE_NAME = 'ftm3-v4';
 
 const CORE_FILES = [
   '/',
   '/index.html',
   '/manifest.json',
+  '/vendor/gsap.min.js',
+  '/vendor/ScrollTrigger.min.js',
+  '/vendor/lenis.min.js',
+  '/data/class-3.json',
+  '/data/class-6.json',
 ];
 
-// INSTALL: cache core shell immediately so SW activates in <1s
 self.addEventListener('install', event => {
   self.skipWaiting();
   event.waitUntil(
@@ -17,7 +21,6 @@ self.addEventListener('install', event => {
   );
 });
 
-// ACTIVATE: delete old caches (clears stale index.html) and take control immediately
 self.addEventListener('activate', event => {
   event.waitUntil(
     caches.keys()
@@ -26,28 +29,28 @@ self.addEventListener('activate', event => {
   );
 });
 
-// FETCH: network-first for navigation (HTML), cache-first for frames/assets
 self.addEventListener('fetch', event => {
   if (event.request.method !== 'GET') return;
 
   const url = new URL(event.request.url);
   if (url.origin !== self.location.origin) return;
 
-  // Navigation requests: try network first so updates appear right away, fall back to cache offline
-  if (event.request.mode === 'navigate') {
+  // Network-first for page navigation & curriculum JSON
+  if (event.request.mode === 'navigate' || url.pathname.startsWith('/data/')) {
     event.respondWith(
       fetch(event.request).then(res => {
         if (res && res.status === 200) {
           const clone = res.clone();
-          caches.open(CACHE_NAME).then(c => c.put('/index.html', clone));
+          const cacheKey = event.request.mode === 'navigate' ? '/index.html' : event.request;
+          caches.open(CACHE_NAME).then(c => c.put(cacheKey, clone));
         }
         return res;
-      }).catch(() => caches.match('/index.html', { ignoreSearch: true }))
+      }).catch(() => caches.match(event.request.mode === 'navigate' ? '/index.html' : event.request, { ignoreSearch: true }))
     );
     return;
   }
 
-  // Frames and other same-origin assets: cache-first, populate cache on first fetch
+  // Cache-first for vendor scripts & 359 animation frames
   event.respondWith(
     caches.match(event.request, { ignoreSearch: true }).then(cached => {
       if (cached) return cached;
